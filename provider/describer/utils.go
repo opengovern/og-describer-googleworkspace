@@ -5,24 +5,30 @@ import (
 	"errors"
 	"fmt"
 	"golang.org/x/time/rate"
+	admin "google.golang.org/api/admin/directory/v1"
 	"net/http"
-	"strconv"
 	"time"
 )
 
+const (
+	MaxPageResultsUsers        = 500
+	MaxPageResultsGroups       = 200
+	MaxPageResultsGroupMembers = 200
+)
+
 type GoogleWorkspaceAPIHandler struct {
-	Client       *http.Client
-	Token        string
+	Service      *admin.Service
+	CustomerID   string
 	RateLimiter  *rate.Limiter
 	Semaphore    chan struct{}
 	MaxRetries   int
 	RetryBackoff time.Duration
 }
 
-func NewGoogleWorkspaceAPIHandler(token string, rateLimit rate.Limit, burst int, maxConcurrency int, maxRetries int, retryBackoff time.Duration) *GoogleWorkspaceAPIHandler {
+func NewGoogleWorkspaceAPIHandler(service *admin.Service, customerID string, rateLimit rate.Limit, burst int, maxConcurrency int, maxRetries int, retryBackoff time.Duration) *GoogleWorkspaceAPIHandler {
 	return &GoogleWorkspaceAPIHandler{
-		Client:       http.DefaultClient,
-		Token:        token,
+		Service:      service,
+		CustomerID:   customerID,
 		RateLimiter:  rate.NewLimiter(rateLimit, burst),
 		Semaphore:    make(chan struct{}, maxConcurrency),
 		MaxRetries:   maxRetries,
@@ -30,35 +36,60 @@ func NewGoogleWorkspaceAPIHandler(token string, rateLimit rate.Limit, burst int,
 	}
 }
 
+func getGroups(ctx context.Context, handler *GoogleWorkspaceAPIHandler) ([]*admin.Group, error) {
+	var groups []*admin.Group
+	var groupsResp *admin.Groups
+	pageToken := ""
+
+	for {
+		req := handler.Service.Groups.List().Customer(handler.CustomerID).MaxResults(MaxPageResultsGroups)
+		if pageToken != "" {
+			req.PageToken(pageToken)
+		}
+
+		requestFunc := func() (*int, error) {
+			var e error
+			groupsResp, e = req.Do()
+			if e != nil {
+				return nil, fmt.Errorf("request execution failed: %w", e)
+			}
+
+			groups = append(groups, groupsResp.Groups...)
+			return &groupsResp.HTTPStatusCode, nil
+		}
+
+		err := handler.DoRequest(ctx, requestFunc)
+		if err != nil {
+			return nil, fmt.Errorf("error during request handling: %w", err)
+		}
+
+		if groupsResp.NextPageToken == "" {
+			break
+		}
+		pageToken = groupsResp.NextPageToken
+	}
+
+	return groups, nil
+}
+
 // DoRequest executes the googleWorkspace API request with rate limiting, retries, and concurrency control.
-func (h *GoogleWorkspaceAPIHandler) DoRequest(ctx context.Context, req *http.Request, requestFunc func(req *http.Request) (*http.Response, error)) error {
+func (h *GoogleWorkspaceAPIHandler) DoRequest(ctx context.Context, requestFunc func() (*int, error)) error {
 	h.Semaphore <- struct{}{}
 	defer func() { <-h.Semaphore }()
-	var resp *http.Response
+	var status *int
 	var err error
 	for attempt := 0; attempt <= h.MaxRetries; attempt++ {
 		// Wait based on rate limiter
 		if err = h.RateLimiter.Wait(ctx); err != nil {
 			return err
 		}
-		// Set request headers
-		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", h.Token))
 		// Execute the request function
-		resp, err = requestFunc(req)
+		status, err = requestFunc()
 		if err == nil {
 			return nil
 		}
 		// Handle rate limit errors
-		if resp != nil && resp.StatusCode == http.StatusTooManyRequests {
-			retryAfter := resp.Header.Get("Retry-After")
-			if retryAfter != "" {
-				resetDuration, _ := strconv.Atoi(retryAfter)
-				if resetDuration > 0 {
-					time.Sleep(time.Duration(resetDuration))
-					continue
-				}
-			}
+		if status != nil && *status == http.StatusTooManyRequests {
 			// Exponential backoff if headers are missing
 			backoff := h.RetryBackoff * (1 << attempt)
 			time.Sleep(backoff)

@@ -2,12 +2,16 @@ package provider
 
 import (
 	"errors"
+	"fmt"
 	model "github.com/opengovern/og-describer-googleworkspace/pkg/sdk/models"
 	"github.com/opengovern/og-describer-googleworkspace/provider/configs"
 	"github.com/opengovern/og-describer-googleworkspace/provider/describer"
 	"github.com/opengovern/og-util/pkg/describe/enums"
 	"golang.org/x/net/context"
+	"golang.org/x/oauth2/google"
 	"golang.org/x/time/rate"
+	admin "google.golang.org/api/admin/directory/v1"
+	"google.golang.org/api/option"
 	"time"
 )
 
@@ -17,12 +21,43 @@ func DescribeListByGoogleWorkspace(describe func(context.Context, *describer.Goo
 		ctx = describer.WithTriggerType(ctx, triggerType)
 
 		var err error
-		// Check for the token
-		if cfg.Token == "" {
-			return nil, errors.New("token must be configured")
+		// Check for the keyFile content
+		if string(cfg.KeyFile) == "" {
+			return nil, errors.New("key file must be configured")
 		}
 
-		googleWorkspaceAPIHandler := describer.NewGoogleWorkspaceAPIHandler(cfg.Token, rate.Every(time.Minute/200), 1, 10, 5, 5*time.Minute)
+		// Check for the admin email
+		if string(cfg.AdminEmail) == "" {
+			return nil, errors.New("admin email must be configured")
+		}
+
+		// Check for the customer id
+		if string(cfg.CustomerID) == "" {
+			return nil, errors.New("customer ID must be configured")
+		}
+
+		scopes := []string{
+			admin.AdminDirectoryUserReadonlyScope,
+			admin.AdminDirectoryGroupReadonlyScope,
+			admin.AdminDirectoryDeviceMobileReadonlyScope,
+		}
+
+		// Create credentials using the service account key
+		config, err := google.JWTConfigFromJSON(cfg.KeyFile, scopes...)
+		if err != nil {
+			return nil, fmt.Errorf("error creating JWT config: %v", err)
+		}
+
+		// Set the Subject to the specified admin email
+		config.Subject = cfg.AdminEmail
+
+		// Create the Admin SDK service using the credentials
+		service, err := admin.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx)))
+		if err != nil {
+			return nil, fmt.Errorf("error creating Admin SDK service: %v", err)
+		}
+
+		googleWorkspaceAPIHandler := describer.NewGoogleWorkspaceAPIHandler(service, cfg.CustomerID, rate.Every(time.Minute/200), 1, 10, 5, 5*time.Minute)
 
 		// Get values from describer
 		var values []model.Resource
@@ -41,12 +76,43 @@ func DescribeSingleByGoogleWorkspace(describe func(context.Context, *describer.G
 		ctx = describer.WithTriggerType(ctx, triggerType)
 
 		var err error
-		// Check for the token
-		if cfg.Token == "" {
-			return nil, errors.New("token must be configured")
+		// Check for the keyFile content
+		if string(cfg.KeyFile) == "" {
+			return nil, errors.New("key file must be configured")
 		}
 
-		googleWorkspaceAPIHandler := describer.NewGoogleWorkspaceAPIHandler(cfg.Token, rate.Every(time.Minute/200), 1, 10, 5, 5*time.Minute)
+		// Check for the admin email
+		if string(cfg.AdminEmail) == "" {
+			return nil, errors.New("admin email must be configured")
+		}
+
+		// Check for the customer id
+		if string(cfg.CustomerID) == "" {
+			return nil, errors.New("customer ID must be configured")
+		}
+
+		scopes := []string{
+			admin.AdminDirectoryUserReadonlyScope,
+			admin.AdminDirectoryGroupReadonlyScope,
+			admin.AdminDirectoryDeviceMobileReadonlyScope,
+		}
+
+		// Create credentials using the service account key
+		config, err := google.JWTConfigFromJSON(cfg.KeyFile, scopes...)
+		if err != nil {
+			return nil, fmt.Errorf("error creating JWT config: %v", err)
+		}
+
+		// Set the Subject to the specified admin email
+		config.Subject = cfg.AdminEmail
+
+		// Create the Admin SDK service using the credentials
+		service, err := admin.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx)))
+		if err != nil {
+			return nil, fmt.Errorf("error creating Admin SDK service: %v", err)
+		}
+
+		googleWorkspaceAPIHandler := describer.NewGoogleWorkspaceAPIHandler(service, cfg.CustomerID, rate.Every(time.Minute/200), 1, 10, 5, 5*time.Minute)
 
 		// Get value from describer
 		value, err := describe(ctx, googleWorkspaceAPIHandler, resourceID)

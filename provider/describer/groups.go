@@ -12,7 +12,7 @@ import (
 	"sync"
 )
 
-func ListUsers(ctx context.Context, handler *GoogleWorkspaceAPIHandler, stream *models.StreamSender) ([]models.Resource, error) {
+func ListGroups(ctx context.Context, handler *GoogleWorkspaceAPIHandler, stream *models.StreamSender) ([]models.Resource, error) {
 	var wg sync.WaitGroup
 	GoogleWorkspaceChan := make(chan models.Resource)
 	errorChan := make(chan error, 1) // Buffered channel to capture errors
@@ -20,7 +20,7 @@ func ListUsers(ctx context.Context, handler *GoogleWorkspaceAPIHandler, stream *
 	go func() {
 		defer close(GoogleWorkspaceChan)
 		defer close(errorChan)
-		if err := processUsers(ctx, handler, GoogleWorkspaceChan, &wg); err != nil {
+		if err := processGroups(ctx, handler, GoogleWorkspaceChan, &wg); err != nil {
 			errorChan <- err // Send error to the error channel
 		}
 		wg.Wait()
@@ -46,43 +46,43 @@ func ListUsers(ctx context.Context, handler *GoogleWorkspaceAPIHandler, stream *
 	}
 }
 
-func GetUser(ctx context.Context, handler *GoogleWorkspaceAPIHandler, resourceID string) (*models.Resource, error) {
-	user, err := processUser(ctx, handler, resourceID)
+func GetGroup(ctx context.Context, handler *GoogleWorkspaceAPIHandler, resourceID string) (*models.Resource, error) {
+	group, err := processGroup(ctx, handler, resourceID)
 	if err != nil {
 		return nil, err
 	}
 	value := models.Resource{
-		ID:   user.Id,
-		Name: user.Name.FullName,
+		ID:   group.Id,
+		Name: group.Name,
 		Description: JSONAllFieldsMarshaller{
-			Value: model.UserDescription{
-				User: *user,
+			Value: model.GroupDescription{
+				Group: *group,
 			},
 		},
 	}
 	return &value, nil
 }
 
-func processUsers(ctx context.Context, handler *GoogleWorkspaceAPIHandler, openaiChan chan<- models.Resource, wg *sync.WaitGroup) error {
-	var users []*admin.User
-	var usersResp *admin.Users
+func processGroups(ctx context.Context, handler *GoogleWorkspaceAPIHandler, openaiChan chan<- models.Resource, wg *sync.WaitGroup) error {
+	var groups []*admin.Group
+	var groupsResp *admin.Groups
 	pageToken := ""
 
 	for {
-		req := handler.Service.Users.List().Customer(handler.CustomerID).MaxResults(MaxPageResultsUsers)
+		req := handler.Service.Groups.List().Customer(handler.CustomerID).MaxResults(MaxPageResultsGroups)
 		if pageToken != "" {
 			req.PageToken(pageToken)
 		}
 
 		requestFunc := func() (*int, error) {
 			var e error
-			usersResp, e = req.Do()
+			groupsResp, e = req.Do()
 			if e != nil {
 				return nil, fmt.Errorf("request execution failed: %w", e)
 			}
 
-			users = append(users, usersResp.Users...)
-			return &usersResp.HTTPStatusCode, nil
+			groups = append(groups, groupsResp.Groups...)
+			return &groupsResp.HTTPStatusCode, nil
 		}
 
 		err := handler.DoRequest(ctx, requestFunc)
@@ -90,40 +90,40 @@ func processUsers(ctx context.Context, handler *GoogleWorkspaceAPIHandler, opena
 			return fmt.Errorf("error during request handling: %w", err)
 		}
 
-		if usersResp.NextPageToken == "" {
+		if groupsResp.NextPageToken == "" {
 			break
 		}
-		pageToken = usersResp.NextPageToken
+		pageToken = groupsResp.NextPageToken
 	}
 
-	for _, user := range users {
+	for _, group := range groups {
 		wg.Add(1)
-		go func(user *admin.User) {
+		go func(group *admin.Group) {
 			defer wg.Done()
 			value := models.Resource{
-				ID:   user.Id,
-				Name: user.Name.FullName,
+				ID:   group.Id,
+				Name: group.Name,
 				Description: JSONAllFieldsMarshaller{
-					Value: model.UserDescription{
-						User: *user,
+					Value: model.GroupDescription{
+						Group: *group,
 					},
 				},
 			}
 			openaiChan <- value
-		}(user)
+		}(group)
 	}
 	return nil
 }
 
-func processUser(ctx context.Context, handler *GoogleWorkspaceAPIHandler, resourceID string) (*admin.User, error) {
-	var user *admin.User
+func processGroup(ctx context.Context, handler *GoogleWorkspaceAPIHandler, resourceID string) (*admin.Group, error) {
+	var group *admin.Group
 	var status *int
 
-	req := handler.Service.Users.Get(resourceID)
+	req := handler.Service.Groups.Get(resourceID)
 
 	requestFunc := func() (*int, error) {
 		var e error
-		user, e = req.Do()
+		group, e = req.Do()
 		if e != nil {
 			var apiErr *googleapi.Error
 			if errors.As(e, &apiErr) {
@@ -139,5 +139,5 @@ func processUser(ctx context.Context, handler *GoogleWorkspaceAPIHandler, resour
 	if err != nil {
 		return nil, fmt.Errorf("error during request handling: %w", err)
 	}
-	return user, nil
+	return group, nil
 }

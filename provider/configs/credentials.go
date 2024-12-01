@@ -1,5 +1,9 @@
 package configs
 
+import "encoding/json"
+
 type IntegrationCredentials struct {
-	Token string `json:"token"`
+	AdminEmail string          `json:"admin_email"`
+	CustomerID string          `json:"customer_id"`
+	KeyFile    json.RawMessage `json:"key_file"`
 }
