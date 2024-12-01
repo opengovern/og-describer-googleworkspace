@@ -1,20 +1,29 @@
 package steampipe
 
-// Please import resource clients file after it's genrated completly
+import (
+	"github.com/opengovern/og-describer-googleworkspace/pkg/sdk/es"
+)
 
 var Map = map[string]string{
-	// Example
-	// "AWS::IdentityStore::GroupMembership":                "aws_identitystore_group_membership",
+  "GoogleWorkspace/User": "google_workspace_user",
+  "GoogleWorkspace/UserAlias": "google_workspace_user_alias",
+  "GoogleWorkspace/Group": "google_workspace_group",
+  "GoogleWorkspace/GroupMember": "google_workspace_group_member",
+  "GoogleWorkspace/OrgUnit": "google_workspace_org_unit",
 }
 
 var DescriptionMap = map[string]interface{}{
-	// Example
-	// "AWS::EC2::VerifiedAccessInstance":                   opengovernance.EC2VerifiedAccessInstance{},
-	
+  "GoogleWorkspace/User": opengovernance.User{},
+  "GoogleWorkspace/UserAlias": opengovernance.UserAlias{},
+  "GoogleWorkspace/Group": opengovernance.Group{},
+  "GoogleWorkspace/GroupMember": opengovernance.GroupMember{},
+  "GoogleWorkspace/OrgUnit": opengovernance.OrgUnit{},
 }
 
 var ReverseMap = map[string]string{
-	// Example:
-	// "aws_redshift_snapshot":                           "AWS::Redshift::Snapshot",
-
+  "google_workspace_user": "GoogleWorkspace/User",
+  "google_workspace_user_alias": "GoogleWorkspace/UserAlias",
+  "google_workspace_group": "GoogleWorkspace/Group",
+  "google_workspace_group_member": "GoogleWorkspace/GroupMember",
+  "google_workspace_org_unit": "GoogleWorkspace/OrgUnit",
 }

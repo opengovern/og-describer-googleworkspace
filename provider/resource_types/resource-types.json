@@ -1,9 +1,37 @@
 [
   {
-    "ResourceName": "AWS::Redshift::Snapshot",
-    "ListDescriber": "ParallelDescribeRegional(describer.RedshiftSnapshot)",
-    "GetDescriber": "ParallelDescribeRegionalSingleResource(describer.GetRedshiftSnapshot)",
-    "SteampipeTable": "aws_redshift_snapshot",
-    "Model": "RedshiftSnapshot"
+    "ResourceName": "GoogleWorkspace/User",
+    "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListUsers)",
+    "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetUser)",
+    "SteampipeTable": "google_workspace_user",
+    "Model": "User"
+  },
+  {
+    "ResourceName": "GoogleWorkspace/UserAlias",
+    "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListUserAliases)",
+    "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetUserAlias)",
+    "SteampipeTable": "google_workspace_user_alias",
+    "Model": "UserAlias"
+  },
+  {
+    "ResourceName": "GoogleWorkspace/Group",
+    "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListGroups)",
+    "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetGroup)",
+    "SteampipeTable": "google_workspace_group",
+    "Model": "Group"
+  },
+  {
+    "ResourceName": "GoogleWorkspace/GroupMember",
+    "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListGroupMembers)",
+    "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetGroupMember)",
+    "SteampipeTable": "google_workspace_group_member",
+    "Model": "GroupMember"
+  },
+  {
+    "ResourceName": "GoogleWorkspace/OrgUnit",
+    "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListOrgUnits)",
+    "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetOrgUnit)",
+    "SteampipeTable": "google_workspace_org_unit",
+    "Model": "OrgUnit"
   }
 ]
