@@ -1,9 +1,9 @@
 package configs
 
 const (
-	StreamName           = "stream_name"
-	JobQueueTopic        = "job_queue_topic"
-	ConsumerGroup        = "consumer-group"
-	JobQueueTopicManuals = "job_queue_topic_manuals"
-	ConsumerGroupManuals = "consumer-group-manuals"
+	StreamName           = "og_describer_googleworkspace"
+	JobQueueTopic        = "og_describer_googleworkspace_job_queue"
+	ConsumerGroup        = "describer-googleworkspace"
+	JobQueueTopicManuals = "og_describer_googleworkspace_manuals_job_queue"
+	ConsumerGroupManuals = "describer-googleworkspace-manuals"
 )
