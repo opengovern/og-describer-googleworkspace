@@ -2,6 +2,7 @@ package googleworkspace
 
 import (
 	"context"
+	opengovernance "github.com/opengovern/og-describer-googleworkspace/pkg/sdk/es"
 	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
@@ -11,10 +12,10 @@ func tableGoogleWorkspaceDomainAlias(ctx context.Context) *plugin.Table {
 		Name:        "google_workspace_domain_alias",
 		Description: "Information about a domain alias entry, including the parent domain, alias name, and verification status.",
 		List: &plugin.ListConfig{
-			Hydrate: nil,
+			Hydrate: opengovernance.ListDomainAlias,
 		},
 		Get: &plugin.GetConfig{
-			Hydrate: nil,
+			Hydrate: opengovernance.GetDomainAlias,
 		},
 		Columns: commonColumns([]*plugin.Column{
 			// Top columns

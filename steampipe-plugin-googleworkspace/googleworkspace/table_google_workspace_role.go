@@ -2,6 +2,7 @@ package googleworkspace
 
 import (
 	"context"
+	opengovernance "github.com/opengovern/og-describer-googleworkspace/pkg/sdk/es"
 	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
@@ -11,10 +12,10 @@ func tableGoogleWorkspaceRole(ctx context.Context) *plugin.Table {
 		Name:        "google_workspace_role",
 		Description: "Details about roles in the Google Workspace system, including privileges and system settings.",
 		List: &plugin.ListConfig{
-			Hydrate: nil,
+			Hydrate: opengovernance.ListRole,
 		},
 		Get: &plugin.GetConfig{
-			Hydrate: nil,
+			Hydrate: opengovernance.GetRole,
 		},
 		Columns: commonColumns([]*plugin.Column{
 			// Top columns

@@ -2,6 +2,7 @@ package googleworkspace
 
 import (
 	"context"
+	opengovernance "github.com/opengovern/og-describer-googleworkspace/pkg/sdk/es"
 	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
@@ -11,10 +12,10 @@ func tableGoogleWorkspaceResourceFeature(ctx context.Context) *plugin.Table {
 		Name:        "google_workspace_resource_feature",
 		Description: "Details about a resource, including its name, kind, and etags.",
 		List: &plugin.ListConfig{
-			Hydrate: nil,
+			Hydrate: opengovernance.ListResourceFeature,
 		},
 		Get: &plugin.GetConfig{
-			Hydrate: nil,
+			Hydrate: opengovernance.GetResourceFeature,
 		},
 		Columns: commonColumns([]*plugin.Column{
 			// Top columns

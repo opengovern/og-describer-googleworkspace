@@ -2,6 +2,7 @@ package googleworkspace
 
 import (
 	"context"
+	opengovernance "github.com/opengovern/og-describer-googleworkspace/pkg/sdk/es"
 	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
@@ -11,11 +12,11 @@ func tableGoogleWorkspaceOrgUnit(ctx context.Context) *plugin.Table {
 		Name:        "google_workspace_org_unit",
 		Description: "Organizational Units in the Google Workspace domain.",
 		List: &plugin.ListConfig{
-			Hydrate: nil,
+			Hydrate: opengovernance.ListOrgUnit,
 		},
 		Get: &plugin.GetConfig{
 			KeyColumns: plugin.SingleColumn("orgUnitId"),
-			Hydrate:    nil,
+			Hydrate:    opengovernance.GetOrgUnit,
 		},
 		Columns: commonColumns([]*plugin.Column{
 			// Top columns

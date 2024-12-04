@@ -2,6 +2,7 @@ package googleworkspace
 
 import (
 	"context"
+	opengovernance "github.com/opengovern/og-describer-googleworkspace/pkg/sdk/es"
 	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
@@ -11,10 +12,10 @@ func tableGoogleWorkspaceGroupMember(ctx context.Context) *plugin.Table {
 		Name:        "google_workspace_group_member",
 		Description: "Group members in the Google Workspace domain.",
 		List: &plugin.ListConfig{
-			Hydrate: nil,
+			Hydrate: opengovernance.ListGroupMember,
 		},
 		Get: &plugin.GetConfig{
-			Hydrate: nil,
+			Hydrate: opengovernance.GetGroupMember,
 		},
 		Columns: commonColumns([]*plugin.Column{
 			// Top columns

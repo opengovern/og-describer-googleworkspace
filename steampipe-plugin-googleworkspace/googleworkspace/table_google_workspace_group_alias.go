@@ -2,6 +2,7 @@ package googleworkspace
 
 import (
 	"context"
+	opengovernance "github.com/opengovern/og-describer-googleworkspace/pkg/sdk/es"
 	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
@@ -11,10 +12,10 @@ func tableGoogleWorkspaceGroupAlias(ctx context.Context) *plugin.Table {
 		Name:        "google_workspace_group_alias",
 		Description: "Details about user aliases in Google Workspace, including alias, primary email, and alias type.",
 		List: &plugin.ListConfig{
-			Hydrate: nil,
+			Hydrate: opengovernance.ListGroupAlias,
 		},
 		Get: &plugin.GetConfig{
-			Hydrate: nil,
+			Hydrate: opengovernance.GetGroupAlias,
 		},
 		Columns: commonColumns([]*plugin.Column{
 			// Top columns
