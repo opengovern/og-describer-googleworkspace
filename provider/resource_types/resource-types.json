@@ -1,0 +1,58 @@
+[
+  {
+    "ResourceName": "GoogleWorkspace/User",
+    "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListUsers)",
+    "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetUser)",
+    "SteampipeTable": "google_workspace_user",
+    "Model": "User"
+  },
+  {
+    "ResourceName": "GoogleWorkspace/UserAlias",
+    "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListUserAliases)",
+    "GetDescriber": "",
+    "SteampipeTable": "google_workspace_user_alias",
+    "Model": "UserAlias"
+  },
+  {
+    "ResourceName": "GoogleWorkspace/Group",
+    "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListGroups)",
+    "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetGroup)",
+    "SteampipeTable": "google_workspace_group",
+    "Model": "Group"
+  },
+  {
+    "ResourceName": "GoogleWorkspace/GroupMember",
+    "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListGroupMembers)",
+    "GetDescriber": "",
+    "SteampipeTable": "google_workspace_group_member",
+    "Model": "GroupMember"
+  },
+  {
+    "ResourceName": "GoogleWorkspace/OrgUnit",
+    "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListOrgUnits)",
+    "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetOrgUnit)",
+    "SteampipeTable": "google_workspace_org_unit",
+    "Model": "OrgUnit"
+  },
+  {
+    "ResourceName": "GoogleWorkspace/MobileDevice",
+    "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListMobileDevices)",
+    "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetMobileDevice)",
+    "SteampipeTable": "google_workspace_mobile_device",
+    "Model": "MobileDevice"
+  },
+  {
+    "ResourceName": "GoogleWorkspace/ChromeDevice",
+    "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListChromeDevices)",
+    "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetChromeDevice)",
+    "SteampipeTable": "google_workspace_chrome_device",
+    "Model": "ChromeDevice"
+  },
+  {
+    "ResourceName": "GoogleWorkspace/Role",
+    "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListRoles)",
+    "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetRole)",
+    "SteampipeTable": "google_workspace_role",
+    "Model": "Role"
+  }
+]
