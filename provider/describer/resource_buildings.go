@@ -55,7 +55,7 @@ func GetResourceBuilding(ctx context.Context, handler *GoogleWorkspaceAPIHandler
 		ID:   building.BuildingId,
 		Name: building.BuildingName,
 		Description: JSONAllFieldsMarshaller{
-			Value: model.BuildingDescription{
+			Value: model.ResourceBuildingDescription{
 				Building: *building,
 			},
 		},
@@ -69,7 +69,7 @@ func processResourceBuildings(ctx context.Context, handler *GoogleWorkspaceAPIHa
 	pageToken := ""
 
 	for {
-		req := handler.Service.Resources.Buildings.List(handler.CustomerID).MaxResults(MaxPageResultsBuildings)
+		req := handler.AdminService.Resources.Buildings.List(handler.CustomerID).MaxResults(MaxPageResultsBuildings)
 		if pageToken != "" {
 			req.PageToken(pageToken)
 		}
@@ -104,7 +104,7 @@ func processResourceBuildings(ctx context.Context, handler *GoogleWorkspaceAPIHa
 				ID:   building.BuildingId,
 				Name: building.BuildingName,
 				Description: JSONAllFieldsMarshaller{
-					Value: model.BuildingDescription{
+					Value: model.ResourceBuildingDescription{
 						Building: *building,
 					},
 				},
@@ -119,7 +119,7 @@ func processResourceBuilding(ctx context.Context, handler *GoogleWorkspaceAPIHan
 	var building *admin.Building
 	var status *int
 
-	req := handler.Service.Resources.Buildings.Get(handler.CustomerID, resourceID)
+	req := handler.AdminService.Resources.Buildings.Get(handler.CustomerID, resourceID)
 
 	requestFunc := func() (*int, error) {
 		var e error

@@ -66,7 +66,7 @@ func GetDomainAlias(ctx context.Context, handler *GoogleWorkspaceAPIHandler, res
 func processDomainAliases(ctx context.Context, handler *GoogleWorkspaceAPIHandler, GoogleWorkspaceChan chan<- models.Resource, wg *sync.WaitGroup) error {
 	var domainAliasesResp *admin.DomainAliases
 
-	req := handler.Service.DomainAliases.List(handler.CustomerID)
+	req := handler.AdminService.DomainAliases.List(handler.CustomerID)
 
 	requestFunc := func() (*int, error) {
 		var e error
@@ -106,7 +106,7 @@ func processDomainAlias(ctx context.Context, handler *GoogleWorkspaceAPIHandler,
 	var domainAlias *admin.DomainAlias
 	var status *int
 
-	req := handler.Service.DomainAliases.Get(handler.CustomerID, resourceID)
+	req := handler.AdminService.DomainAliases.Get(handler.CustomerID, resourceID)
 
 	requestFunc := func() (*int, error) {
 		var e error

@@ -60,14 +60,14 @@ type PrivilegeDescription struct {
 	admin.Privilege
 }
 
-type BuildingDescription struct {
+type ResourceBuildingDescription struct {
 	admin.Building
 }
 
-type CalenderDescription struct {
+type ResourceCalenderDescription struct {
 	admin.CalendarResource
 }
 
-type FeatureDescription struct {
+type ResourceFeatureDescription struct {
 	admin.Feature
 }

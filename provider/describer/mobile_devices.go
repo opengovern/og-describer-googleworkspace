@@ -69,7 +69,7 @@ func processMobileDevices(ctx context.Context, handler *GoogleWorkspaceAPIHandle
 	pageToken := ""
 
 	for {
-		req := handler.Service.Mobiledevices.List(handler.CustomerID).MaxResults(MaxPageResultsMobileDevices)
+		req := handler.AdminService.Mobiledevices.List(handler.CustomerID).MaxResults(MaxPageResultsMobileDevices)
 		if pageToken != "" {
 			req.PageToken(pageToken)
 		}
@@ -119,7 +119,7 @@ func processMobileDevice(ctx context.Context, handler *GoogleWorkspaceAPIHandler
 	var mobileDevice *admin.MobileDevice
 	var status *int
 
-	req := handler.Service.Mobiledevices.Get(handler.CustomerID, resourceID)
+	req := handler.AdminService.Mobiledevices.Get(handler.CustomerID, resourceID)
 
 	requestFunc := func() (*int, error) {
 		var e error

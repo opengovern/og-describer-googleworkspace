@@ -70,7 +70,7 @@ func processRoleAssignments(ctx context.Context, handler *GoogleWorkspaceAPIHand
 	pageToken := ""
 
 	for {
-		req := handler.Service.RoleAssignments.List(handler.CustomerID).MaxResults(MaxPageResultsRoleAssignments)
+		req := handler.AdminService.RoleAssignments.List(handler.CustomerID).MaxResults(MaxPageResultsRoleAssignments)
 		if pageToken != "" {
 			req.PageToken(pageToken)
 		}
@@ -120,7 +120,7 @@ func processRoleAssignment(ctx context.Context, handler *GoogleWorkspaceAPIHandl
 	var roleAssignment *admin.RoleAssignment
 	var status *int
 
-	req := handler.Service.RoleAssignments.Get(handler.CustomerID, resourceID)
+	req := handler.AdminService.RoleAssignments.Get(handler.CustomerID, resourceID)
 
 	requestFunc := func() (*int, error) {
 		var e error

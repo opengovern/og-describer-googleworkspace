@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"golang.org/x/time/rate"
 	admin "google.golang.org/api/admin/directory/v1"
+	"google.golang.org/api/gmail/v1"
 	"net/http"
 	"time"
 )
@@ -24,7 +25,8 @@ const (
 )
 
 type GoogleWorkspaceAPIHandler struct {
-	Service      *admin.Service
+	AdminService *admin.Service
+	GmailService *gmail.Service
 	CustomerID   string
 	RateLimiter  *rate.Limiter
 	Semaphore    chan struct{}
@@ -32,9 +34,10 @@ type GoogleWorkspaceAPIHandler struct {
 	RetryBackoff time.Duration
 }
 
-func NewGoogleWorkspaceAPIHandler(service *admin.Service, customerID string, rateLimit rate.Limit, burst int, maxConcurrency int, maxRetries int, retryBackoff time.Duration) *GoogleWorkspaceAPIHandler {
+func NewGoogleWorkspaceAPIHandler(adminService *admin.Service, gmailService *gmail.Service, customerID string, rateLimit rate.Limit, burst int, maxConcurrency int, maxRetries int, retryBackoff time.Duration) *GoogleWorkspaceAPIHandler {
 	return &GoogleWorkspaceAPIHandler{
-		Service:      service,
+		AdminService: adminService,
+		GmailService: gmailService,
 		CustomerID:   customerID,
 		RateLimiter:  rate.NewLimiter(rateLimit, burst),
 		Semaphore:    make(chan struct{}, maxConcurrency),
@@ -49,7 +52,7 @@ func getUsers(ctx context.Context, handler *GoogleWorkspaceAPIHandler) ([]*admin
 	pageToken := ""
 
 	for {
-		req := handler.Service.Users.List().Customer(handler.CustomerID).MaxResults(MaxPageResultsUsers)
+		req := handler.AdminService.Users.List().Customer(handler.CustomerID).MaxResults(MaxPageResultsUsers)
 		if pageToken != "" {
 			req.PageToken(pageToken)
 		}
@@ -85,7 +88,7 @@ func getGroups(ctx context.Context, handler *GoogleWorkspaceAPIHandler) ([]*admi
 	pageToken := ""
 
 	for {
-		req := handler.Service.Groups.List().Customer(handler.CustomerID).MaxResults(MaxPageResultsGroups)
+		req := handler.AdminService.Groups.List().Customer(handler.CustomerID).MaxResults(MaxPageResultsGroups)
 		if pageToken != "" {
 			req.PageToken(pageToken)
 		}

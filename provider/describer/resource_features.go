@@ -55,7 +55,7 @@ func GetResourceFeature(ctx context.Context, handler *GoogleWorkspaceAPIHandler,
 		ID:   feature.Name,
 		Name: feature.Name,
 		Description: JSONAllFieldsMarshaller{
-			Value: model.FeatureDescription{
+			Value: model.ResourceFeatureDescription{
 				Feature: *feature,
 			},
 		},
@@ -69,7 +69,7 @@ func processResourceFeatures(ctx context.Context, handler *GoogleWorkspaceAPIHan
 	pageToken := ""
 
 	for {
-		req := handler.Service.Resources.Features.List(handler.CustomerID).MaxResults(MaxPageResultsFeatures)
+		req := handler.AdminService.Resources.Features.List(handler.CustomerID).MaxResults(MaxPageResultsFeatures)
 		if pageToken != "" {
 			req.PageToken(pageToken)
 		}
@@ -104,7 +104,7 @@ func processResourceFeatures(ctx context.Context, handler *GoogleWorkspaceAPIHan
 				ID:   feature.Name,
 				Name: feature.Name,
 				Description: JSONAllFieldsMarshaller{
-					Value: model.FeatureDescription{
+					Value: model.ResourceFeatureDescription{
 						Feature: *feature,
 					},
 				},
@@ -119,7 +119,7 @@ func processResourceFeature(ctx context.Context, handler *GoogleWorkspaceAPIHand
 	var feature *admin.Feature
 	var status *int
 
-	req := handler.Service.Resources.Features.Get(handler.CustomerID, resourceID)
+	req := handler.AdminService.Resources.Features.Get(handler.CustomerID, resourceID)
 
 	requestFunc := func() (*int, error) {
 		var e error

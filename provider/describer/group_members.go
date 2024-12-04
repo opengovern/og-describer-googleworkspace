@@ -56,7 +56,7 @@ func processGroupMembers(ctx context.Context, handler *GoogleWorkspaceAPIHandler
 	pageToken := ""
 
 	for {
-		req := handler.Service.Members.List(groupID).MaxResults(MaxPageResultsGroupMembers)
+		req := handler.AdminService.Members.List(groupID).MaxResults(MaxPageResultsGroupMembers)
 		if pageToken != "" {
 			req.PageToken(pageToken)
 		}

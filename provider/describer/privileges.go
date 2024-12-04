@@ -46,7 +46,7 @@ func ListPrivileges(ctx context.Context, handler *GoogleWorkspaceAPIHandler, str
 func processPrivileges(ctx context.Context, handler *GoogleWorkspaceAPIHandler, GoogleWorkspaceChan chan<- models.Resource, wg *sync.WaitGroup) error {
 	var privilegesResp *admin.Privileges
 
-	req := handler.Service.Privileges.List(handler.CustomerID)
+	req := handler.AdminService.Privileges.List(handler.CustomerID)
 
 	requestFunc := func() (*int, error) {
 		var e error

@@ -66,7 +66,7 @@ func GetOrgUnit(ctx context.Context, handler *GoogleWorkspaceAPIHandler, resourc
 func processOrgUnits(ctx context.Context, handler *GoogleWorkspaceAPIHandler, GoogleWorkspaceChan chan<- models.Resource, wg *sync.WaitGroup) error {
 	var orgUnits []*admin.OrgUnit
 	var orgUnitsResp *admin.OrgUnits
-	req := handler.Service.Orgunits.List(handler.CustomerID)
+	req := handler.AdminService.Orgunits.List(handler.CustomerID)
 
 	requestFunc := func() (*int, error) {
 		var e error
@@ -107,7 +107,7 @@ func processOrgUnit(ctx context.Context, handler *GoogleWorkspaceAPIHandler, res
 	var orgUnit *admin.OrgUnit
 	var status *int
 
-	req := handler.Service.Orgunits.Get(handler.CustomerID, resourceID)
+	req := handler.AdminService.Orgunits.Get(handler.CustomerID, resourceID)
 
 	requestFunc := func() (*int, error) {
 		var e error

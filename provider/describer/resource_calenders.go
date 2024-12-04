@@ -55,7 +55,7 @@ func GetResourceCalender(ctx context.Context, handler *GoogleWorkspaceAPIHandler
 		ID:   calender.ResourceId,
 		Name: calender.ResourceName,
 		Description: JSONAllFieldsMarshaller{
-			Value: model.CalenderDescription{
+			Value: model.ResourceCalenderDescription{
 				CalendarResource: *calender,
 			},
 		},
@@ -69,7 +69,7 @@ func processResourceCalenders(ctx context.Context, handler *GoogleWorkspaceAPIHa
 	pageToken := ""
 
 	for {
-		req := handler.Service.Resources.Calendars.List(handler.CustomerID).MaxResults(MaxPageResultsCalenders)
+		req := handler.AdminService.Resources.Calendars.List(handler.CustomerID).MaxResults(MaxPageResultsCalenders)
 		if pageToken != "" {
 			req.PageToken(pageToken)
 		}
@@ -104,7 +104,7 @@ func processResourceCalenders(ctx context.Context, handler *GoogleWorkspaceAPIHa
 				ID:   calender.ResourceId,
 				Name: calender.ResourceName,
 				Description: JSONAllFieldsMarshaller{
-					Value: model.CalenderDescription{
+					Value: model.ResourceCalenderDescription{
 						CalendarResource: *calender,
 					},
 				},
@@ -119,7 +119,7 @@ func processResourceCalender(ctx context.Context, handler *GoogleWorkspaceAPIHan
 	var calender *admin.CalendarResource
 	var status *int
 
-	req := handler.Service.Resources.Calendars.Get(handler.CustomerID, resourceID)
+	req := handler.AdminService.Resources.Calendars.Get(handler.CustomerID, resourceID)
 
 	requestFunc := func() (*int, error) {
 		var e error

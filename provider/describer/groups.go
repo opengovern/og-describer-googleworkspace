@@ -69,7 +69,7 @@ func processGroups(ctx context.Context, handler *GoogleWorkspaceAPIHandler, Goog
 	pageToken := ""
 
 	for {
-		req := handler.Service.Groups.List().Customer(handler.CustomerID).MaxResults(MaxPageResultsGroups)
+		req := handler.AdminService.Groups.List().Customer(handler.CustomerID).MaxResults(MaxPageResultsGroups)
 		if pageToken != "" {
 			req.PageToken(pageToken)
 		}
@@ -119,7 +119,7 @@ func processGroup(ctx context.Context, handler *GoogleWorkspaceAPIHandler, resou
 	var group *admin.Group
 	var status *int
 
-	req := handler.Service.Groups.Get(resourceID)
+	req := handler.AdminService.Groups.Get(resourceID)
 
 	requestFunc := func() (*int, error) {
 		var e error

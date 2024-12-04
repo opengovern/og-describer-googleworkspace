@@ -11,6 +11,7 @@ import (
 	"golang.org/x/oauth2/google"
 	"golang.org/x/time/rate"
 	admin "google.golang.org/api/admin/directory/v1"
+	"google.golang.org/api/gmail/v1"
 	"google.golang.org/api/option"
 	"time"
 )
@@ -42,6 +43,7 @@ func DescribeListByGoogleWorkspace(describe func(context.Context, *describer.Goo
 			admin.AdminDirectoryDeviceMobileReadonlyScope,
 			admin.AdminDirectoryOrgunitReadonlyScope,
 			admin.AdminDirectoryRolemanagementReadonlyScope,
+			gmail.GmailSendScope,
 		}
 
 		// Create credentials using the service account key
@@ -54,12 +56,18 @@ func DescribeListByGoogleWorkspace(describe func(context.Context, *describer.Goo
 		config.Subject = cfg.AdminEmail
 
 		// Create the Admin SDK service using the credentials
-		service, err := admin.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx)))
+		adminService, err := admin.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx)))
 		if err != nil {
 			return nil, fmt.Errorf("error creating Admin SDK service: %v", err)
 		}
 
-		googleWorkspaceAPIHandler := describer.NewGoogleWorkspaceAPIHandler(service, cfg.CustomerID, rate.Every(time.Minute/200), 1, 10, 5, 5*time.Minute)
+		// Create the Gmail SDK service using the credentials
+		gmailService, err := gmail.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx)))
+		if err != nil {
+			return nil, fmt.Errorf("error creating Gmail SDK service: %v", err)
+		}
+
+		googleWorkspaceAPIHandler := describer.NewGoogleWorkspaceAPIHandler(adminService, gmailService, cfg.CustomerID, rate.Every(time.Minute/200), 1, 10, 5, 5*time.Minute)
 
 		// Get values from describer
 		var values []model.Resource
@@ -97,6 +105,9 @@ func DescribeSingleByGoogleWorkspace(describe func(context.Context, *describer.G
 			admin.AdminDirectoryUserReadonlyScope,
 			admin.AdminDirectoryGroupReadonlyScope,
 			admin.AdminDirectoryDeviceMobileReadonlyScope,
+			admin.AdminDirectoryOrgunitReadonlyScope,
+			admin.AdminDirectoryRolemanagementReadonlyScope,
+			gmail.GmailSendScope,
 		}
 
 		// Create credentials using the service account key
@@ -109,13 +120,18 @@ func DescribeSingleByGoogleWorkspace(describe func(context.Context, *describer.G
 		config.Subject = cfg.AdminEmail
 
 		// Create the Admin SDK service using the credentials
-		service, err := admin.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx)))
+		adminService, err := admin.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx)))
 		if err != nil {
 			return nil, fmt.Errorf("error creating Admin SDK service: %v", err)
 		}
 
-		googleWorkspaceAPIHandler := describer.NewGoogleWorkspaceAPIHandler(service, cfg.CustomerID, rate.Every(time.Minute/200), 1, 10, 5, 5*time.Minute)
+		// Create the Gmail SDK service using the credentials
+		gmailService, err := gmail.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx)))
+		if err != nil {
+			return nil, fmt.Errorf("error creating Gmail SDK service: %v", err)
+		}
 
+		googleWorkspaceAPIHandler := describer.NewGoogleWorkspaceAPIHandler(adminService, gmailService, cfg.CustomerID, rate.Every(time.Minute/200), 1, 10, 5, 5*time.Minute)
 		// Get value from describer
 		value, err := describe(ctx, googleWorkspaceAPIHandler, resourceID)
 		if err != nil {

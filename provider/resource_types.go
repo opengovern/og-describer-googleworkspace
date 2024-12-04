@@ -48,6 +48,16 @@ var ResourceTypes = map[string]model.ResourceType{
 		GetDescriber:    nil,
 	},
 
+	"GoogleWorkspace/GroupAlias": {
+		IntegrationType: configs.IntegrationName,
+		ResourceName:    "GoogleWorkspace/GroupAlias",
+		Tags:            map[string][]string{},
+		Labels:          map[string]string{},
+		Annotations:     map[string]string{},
+		ListDescriber:   DescribeListByGoogleWorkspace(describer.ListGroupAliases),
+		GetDescriber:    nil,
+	},
+
 	"GoogleWorkspace/OrgUnit": {
 		IntegrationType: configs.IntegrationName,
 		ResourceName:    "GoogleWorkspace/OrgUnit",
@@ -86,5 +96,75 @@ var ResourceTypes = map[string]model.ResourceType{
 		Annotations:     map[string]string{},
 		ListDescriber:   DescribeListByGoogleWorkspace(describer.ListRoles),
 		GetDescriber:    DescribeSingleByGoogleWorkspace(describer.GetRole),
+	},
+
+	"GoogleWorkspace/RoleAssignment": {
+		IntegrationType: configs.IntegrationName,
+		ResourceName:    "GoogleWorkspace/RoleAssignment",
+		Tags:            map[string][]string{},
+		Labels:          map[string]string{},
+		Annotations:     map[string]string{},
+		ListDescriber:   DescribeListByGoogleWorkspace(describer.ListRoleAssignments),
+		GetDescriber:    DescribeSingleByGoogleWorkspace(describer.GetRoleAssignment),
+	},
+
+	"GoogleWorkspace/Domain": {
+		IntegrationType: configs.IntegrationName,
+		ResourceName:    "GoogleWorkspace/Domain",
+		Tags:            map[string][]string{},
+		Labels:          map[string]string{},
+		Annotations:     map[string]string{},
+		ListDescriber:   DescribeListByGoogleWorkspace(describer.ListDomains),
+		GetDescriber:    DescribeSingleByGoogleWorkspace(describer.GetDomain),
+	},
+
+	"GoogleWorkspace/DomainAlias": {
+		IntegrationType: configs.IntegrationName,
+		ResourceName:    "GoogleWorkspace/DomainAlias",
+		Tags:            map[string][]string{},
+		Labels:          map[string]string{},
+		Annotations:     map[string]string{},
+		ListDescriber:   DescribeListByGoogleWorkspace(describer.ListDomainAliases),
+		GetDescriber:    DescribeSingleByGoogleWorkspace(describer.GetDomainAlias),
+	},
+
+	"GoogleWorkspace/Privilege": {
+		IntegrationType: configs.IntegrationName,
+		ResourceName:    "GoogleWorkspace/Privilege",
+		Tags:            map[string][]string{},
+		Labels:          map[string]string{},
+		Annotations:     map[string]string{},
+		ListDescriber:   DescribeListByGoogleWorkspace(describer.ListPrivileges),
+		GetDescriber:    nil,
+	},
+
+	"GoogleWorkspace/ResourceBuilding": {
+		IntegrationType: configs.IntegrationName,
+		ResourceName:    "GoogleWorkspace/ResourceBuilding",
+		Tags:            map[string][]string{},
+		Labels:          map[string]string{},
+		Annotations:     map[string]string{},
+		ListDescriber:   DescribeListByGoogleWorkspace(describer.ListResourceBuildings),
+		GetDescriber:    DescribeSingleByGoogleWorkspace(describer.GetResourceBuilding),
+	},
+
+	"GoogleWorkspace/ResourceCalender": {
+		IntegrationType: configs.IntegrationName,
+		ResourceName:    "GoogleWorkspace/ResourceCalender",
+		Tags:            map[string][]string{},
+		Labels:          map[string]string{},
+		Annotations:     map[string]string{},
+		ListDescriber:   DescribeListByGoogleWorkspace(describer.ListResourceCalenders),
+		GetDescriber:    DescribeSingleByGoogleWorkspace(describer.GetResourceCalender),
+	},
+
+	"GoogleWorkspace/ResourceFeature": {
+		IntegrationType: configs.IntegrationName,
+		ResourceName:    "GoogleWorkspace/ResourceFeature",
+		Tags:            map[string][]string{},
+		Labels:          map[string]string{},
+		Annotations:     map[string]string{},
+		ListDescriber:   DescribeListByGoogleWorkspace(describer.ListResourceFeatures),
+		GetDescriber:    DescribeSingleByGoogleWorkspace(describer.GetResourceFeature),
 	},
 }

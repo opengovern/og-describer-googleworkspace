@@ -1605,3 +1605,1595 @@ func GetRole(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 }
 
 // ==========================  END: Role =============================
+
+// ==========================  START: RoleAssignment =============================
+
+type RoleAssignment struct {
+	ResourceID      string                                    `json:"resource_id"`
+	PlatformID      string                                    `json:"platform_id"`
+	Description     googleworkspace.RoleAssignmentDescription `json:"description"`
+	Metadata        googleworkspace.Metadata                  `json:"metadata"`
+	DescribedBy     string                                    `json:"described_by"`
+	ResourceType    string                                    `json:"resource_type"`
+	IntegrationType string                                    `json:"integration_type"`
+	IntegrationID   string                                    `json:"integration_id"`
+}
+
+type RoleAssignmentHit struct {
+	ID      string         `json:"_id"`
+	Score   float64        `json:"_score"`
+	Index   string         `json:"_index"`
+	Type    string         `json:"_type"`
+	Version int64          `json:"_version,omitempty"`
+	Source  RoleAssignment `json:"_source"`
+	Sort    []interface{}  `json:"sort"`
+}
+
+type RoleAssignmentHits struct {
+	Total essdk.SearchTotal   `json:"total"`
+	Hits  []RoleAssignmentHit `json:"hits"`
+}
+
+type RoleAssignmentSearchResponse struct {
+	PitID string             `json:"pit_id"`
+	Hits  RoleAssignmentHits `json:"hits"`
+}
+
+type RoleAssignmentPaginator struct {
+	paginator *essdk.BaseESPaginator
+}
+
+func (k Client) NewRoleAssignmentPaginator(filters []essdk.BoolFilter, limit *int64) (RoleAssignmentPaginator, error) {
+	paginator, err := essdk.NewPaginator(k.ES(), "googleworkspace_roleassignment", filters, limit)
+	if err != nil {
+		return RoleAssignmentPaginator{}, err
+	}
+
+	p := RoleAssignmentPaginator{
+		paginator: paginator,
+	}
+
+	return p, nil
+}
+
+func (p RoleAssignmentPaginator) HasNext() bool {
+	return !p.paginator.Done()
+}
+
+func (p RoleAssignmentPaginator) Close(ctx context.Context) error {
+	return p.paginator.Deallocate(ctx)
+}
+
+func (p RoleAssignmentPaginator) NextPage(ctx context.Context) ([]RoleAssignment, error) {
+	var response RoleAssignmentSearchResponse
+	err := p.paginator.Search(ctx, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	var values []RoleAssignment
+	for _, hit := range response.Hits.Hits {
+		values = append(values, hit.Source)
+	}
+
+	hits := int64(len(response.Hits.Hits))
+	if hits > 0 {
+		p.paginator.UpdateState(hits, response.Hits.Hits[hits-1].Sort, response.PitID)
+	} else {
+		p.paginator.UpdateState(hits, nil, "")
+	}
+
+	return values, nil
+}
+
+var listRoleAssignmentFilters = map[string]string{}
+
+func ListRoleAssignment(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("ListRoleAssignment")
+	runtime.GC()
+
+	// create service
+	cfg := essdk.GetConfig(d.Connection)
+	ke, err := essdk.NewClientCached(cfg, d.ConnectionCache, ctx)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListRoleAssignment NewClientCached", "error", err)
+		return nil, err
+	}
+	k := Client{Client: ke}
+
+	sc, err := steampipesdk.NewSelfClientCached(ctx, d.ConnectionCache)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListRoleAssignment NewSelfClientCached", "error", err)
+		return nil, err
+	}
+	accountId, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyAccountID)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListRoleAssignment GetConfigTableValueOrNil for OpenGovernanceConfigKeyAccountID", "error", err)
+		return nil, err
+	}
+	encodedResourceCollectionFilters, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyResourceCollectionFilters)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListRoleAssignment GetConfigTableValueOrNil for OpenGovernanceConfigKeyResourceCollectionFilters", "error", err)
+		return nil, err
+	}
+	clientType, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyClientType)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListRoleAssignment GetConfigTableValueOrNil for OpenGovernanceConfigKeyClientType", "error", err)
+		return nil, err
+	}
+
+	paginator, err := k.NewRoleAssignmentPaginator(essdk.BuildFilter(ctx, d.QueryContext, listRoleAssignmentFilters, "googleworkspace", accountId, encodedResourceCollectionFilters, clientType), d.QueryContext.Limit)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListRoleAssignment NewRoleAssignmentPaginator", "error", err)
+		return nil, err
+	}
+
+	for paginator.HasNext() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			plugin.Logger(ctx).Error("ListRoleAssignment paginator.NextPage", "error", err)
+			return nil, err
+		}
+
+		for _, v := range page {
+			d.StreamListItem(ctx, v)
+		}
+	}
+
+	err = paginator.Close(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+var getRoleAssignmentFilters = map[string]string{}
+
+func GetRoleAssignment(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("GetRoleAssignment")
+	runtime.GC()
+	// create service
+	cfg := essdk.GetConfig(d.Connection)
+	ke, err := essdk.NewClientCached(cfg, d.ConnectionCache, ctx)
+	if err != nil {
+		return nil, err
+	}
+	k := Client{Client: ke}
+
+	sc, err := steampipesdk.NewSelfClientCached(ctx, d.ConnectionCache)
+	if err != nil {
+		return nil, err
+	}
+	accountId, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyAccountID)
+	if err != nil {
+		return nil, err
+	}
+	encodedResourceCollectionFilters, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyResourceCollectionFilters)
+	if err != nil {
+		return nil, err
+	}
+	clientType, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyClientType)
+	if err != nil {
+		return nil, err
+	}
+
+	limit := int64(1)
+	paginator, err := k.NewRoleAssignmentPaginator(essdk.BuildFilter(ctx, d.QueryContext, getRoleAssignmentFilters, "googleworkspace", accountId, encodedResourceCollectionFilters, clientType), &limit)
+	if err != nil {
+		return nil, err
+	}
+
+	for paginator.HasNext() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, v := range page {
+			return v, nil
+		}
+	}
+
+	err = paginator.Close(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+// ==========================  END: RoleAssignment =============================
+
+// ==========================  START: Domain =============================
+
+type Domain struct {
+	ResourceID      string                            `json:"resource_id"`
+	PlatformID      string                            `json:"platform_id"`
+	Description     googleworkspace.DomainDescription `json:"description"`
+	Metadata        googleworkspace.Metadata          `json:"metadata"`
+	DescribedBy     string                            `json:"described_by"`
+	ResourceType    string                            `json:"resource_type"`
+	IntegrationType string                            `json:"integration_type"`
+	IntegrationID   string                            `json:"integration_id"`
+}
+
+type DomainHit struct {
+	ID      string        `json:"_id"`
+	Score   float64       `json:"_score"`
+	Index   string        `json:"_index"`
+	Type    string        `json:"_type"`
+	Version int64         `json:"_version,omitempty"`
+	Source  Domain        `json:"_source"`
+	Sort    []interface{} `json:"sort"`
+}
+
+type DomainHits struct {
+	Total essdk.SearchTotal `json:"total"`
+	Hits  []DomainHit       `json:"hits"`
+}
+
+type DomainSearchResponse struct {
+	PitID string     `json:"pit_id"`
+	Hits  DomainHits `json:"hits"`
+}
+
+type DomainPaginator struct {
+	paginator *essdk.BaseESPaginator
+}
+
+func (k Client) NewDomainPaginator(filters []essdk.BoolFilter, limit *int64) (DomainPaginator, error) {
+	paginator, err := essdk.NewPaginator(k.ES(), "googleworkspace_domain", filters, limit)
+	if err != nil {
+		return DomainPaginator{}, err
+	}
+
+	p := DomainPaginator{
+		paginator: paginator,
+	}
+
+	return p, nil
+}
+
+func (p DomainPaginator) HasNext() bool {
+	return !p.paginator.Done()
+}
+
+func (p DomainPaginator) Close(ctx context.Context) error {
+	return p.paginator.Deallocate(ctx)
+}
+
+func (p DomainPaginator) NextPage(ctx context.Context) ([]Domain, error) {
+	var response DomainSearchResponse
+	err := p.paginator.Search(ctx, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	var values []Domain
+	for _, hit := range response.Hits.Hits {
+		values = append(values, hit.Source)
+	}
+
+	hits := int64(len(response.Hits.Hits))
+	if hits > 0 {
+		p.paginator.UpdateState(hits, response.Hits.Hits[hits-1].Sort, response.PitID)
+	} else {
+		p.paginator.UpdateState(hits, nil, "")
+	}
+
+	return values, nil
+}
+
+var listDomainFilters = map[string]string{}
+
+func ListDomain(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("ListDomain")
+	runtime.GC()
+
+	// create service
+	cfg := essdk.GetConfig(d.Connection)
+	ke, err := essdk.NewClientCached(cfg, d.ConnectionCache, ctx)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListDomain NewClientCached", "error", err)
+		return nil, err
+	}
+	k := Client{Client: ke}
+
+	sc, err := steampipesdk.NewSelfClientCached(ctx, d.ConnectionCache)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListDomain NewSelfClientCached", "error", err)
+		return nil, err
+	}
+	accountId, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyAccountID)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListDomain GetConfigTableValueOrNil for OpenGovernanceConfigKeyAccountID", "error", err)
+		return nil, err
+	}
+	encodedResourceCollectionFilters, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyResourceCollectionFilters)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListDomain GetConfigTableValueOrNil for OpenGovernanceConfigKeyResourceCollectionFilters", "error", err)
+		return nil, err
+	}
+	clientType, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyClientType)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListDomain GetConfigTableValueOrNil for OpenGovernanceConfigKeyClientType", "error", err)
+		return nil, err
+	}
+
+	paginator, err := k.NewDomainPaginator(essdk.BuildFilter(ctx, d.QueryContext, listDomainFilters, "googleworkspace", accountId, encodedResourceCollectionFilters, clientType), d.QueryContext.Limit)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListDomain NewDomainPaginator", "error", err)
+		return nil, err
+	}
+
+	for paginator.HasNext() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			plugin.Logger(ctx).Error("ListDomain paginator.NextPage", "error", err)
+			return nil, err
+		}
+
+		for _, v := range page {
+			d.StreamListItem(ctx, v)
+		}
+	}
+
+	err = paginator.Close(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+var getDomainFilters = map[string]string{}
+
+func GetDomain(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("GetDomain")
+	runtime.GC()
+	// create service
+	cfg := essdk.GetConfig(d.Connection)
+	ke, err := essdk.NewClientCached(cfg, d.ConnectionCache, ctx)
+	if err != nil {
+		return nil, err
+	}
+	k := Client{Client: ke}
+
+	sc, err := steampipesdk.NewSelfClientCached(ctx, d.ConnectionCache)
+	if err != nil {
+		return nil, err
+	}
+	accountId, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyAccountID)
+	if err != nil {
+		return nil, err
+	}
+	encodedResourceCollectionFilters, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyResourceCollectionFilters)
+	if err != nil {
+		return nil, err
+	}
+	clientType, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyClientType)
+	if err != nil {
+		return nil, err
+	}
+
+	limit := int64(1)
+	paginator, err := k.NewDomainPaginator(essdk.BuildFilter(ctx, d.QueryContext, getDomainFilters, "googleworkspace", accountId, encodedResourceCollectionFilters, clientType), &limit)
+	if err != nil {
+		return nil, err
+	}
+
+	for paginator.HasNext() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, v := range page {
+			return v, nil
+		}
+	}
+
+	err = paginator.Close(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+// ==========================  END: Domain =============================
+
+// ==========================  START: DomainAlias =============================
+
+type DomainAlias struct {
+	ResourceID      string                                 `json:"resource_id"`
+	PlatformID      string                                 `json:"platform_id"`
+	Description     googleworkspace.DomainAliasDescription `json:"description"`
+	Metadata        googleworkspace.Metadata               `json:"metadata"`
+	DescribedBy     string                                 `json:"described_by"`
+	ResourceType    string                                 `json:"resource_type"`
+	IntegrationType string                                 `json:"integration_type"`
+	IntegrationID   string                                 `json:"integration_id"`
+}
+
+type DomainAliasHit struct {
+	ID      string        `json:"_id"`
+	Score   float64       `json:"_score"`
+	Index   string        `json:"_index"`
+	Type    string        `json:"_type"`
+	Version int64         `json:"_version,omitempty"`
+	Source  DomainAlias   `json:"_source"`
+	Sort    []interface{} `json:"sort"`
+}
+
+type DomainAliasHits struct {
+	Total essdk.SearchTotal `json:"total"`
+	Hits  []DomainAliasHit  `json:"hits"`
+}
+
+type DomainAliasSearchResponse struct {
+	PitID string          `json:"pit_id"`
+	Hits  DomainAliasHits `json:"hits"`
+}
+
+type DomainAliasPaginator struct {
+	paginator *essdk.BaseESPaginator
+}
+
+func (k Client) NewDomainAliasPaginator(filters []essdk.BoolFilter, limit *int64) (DomainAliasPaginator, error) {
+	paginator, err := essdk.NewPaginator(k.ES(), "googleworkspace_domainalias", filters, limit)
+	if err != nil {
+		return DomainAliasPaginator{}, err
+	}
+
+	p := DomainAliasPaginator{
+		paginator: paginator,
+	}
+
+	return p, nil
+}
+
+func (p DomainAliasPaginator) HasNext() bool {
+	return !p.paginator.Done()
+}
+
+func (p DomainAliasPaginator) Close(ctx context.Context) error {
+	return p.paginator.Deallocate(ctx)
+}
+
+func (p DomainAliasPaginator) NextPage(ctx context.Context) ([]DomainAlias, error) {
+	var response DomainAliasSearchResponse
+	err := p.paginator.Search(ctx, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	var values []DomainAlias
+	for _, hit := range response.Hits.Hits {
+		values = append(values, hit.Source)
+	}
+
+	hits := int64(len(response.Hits.Hits))
+	if hits > 0 {
+		p.paginator.UpdateState(hits, response.Hits.Hits[hits-1].Sort, response.PitID)
+	} else {
+		p.paginator.UpdateState(hits, nil, "")
+	}
+
+	return values, nil
+}
+
+var listDomainAliasFilters = map[string]string{}
+
+func ListDomainAlias(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("ListDomainAlias")
+	runtime.GC()
+
+	// create service
+	cfg := essdk.GetConfig(d.Connection)
+	ke, err := essdk.NewClientCached(cfg, d.ConnectionCache, ctx)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListDomainAlias NewClientCached", "error", err)
+		return nil, err
+	}
+	k := Client{Client: ke}
+
+	sc, err := steampipesdk.NewSelfClientCached(ctx, d.ConnectionCache)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListDomainAlias NewSelfClientCached", "error", err)
+		return nil, err
+	}
+	accountId, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyAccountID)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListDomainAlias GetConfigTableValueOrNil for OpenGovernanceConfigKeyAccountID", "error", err)
+		return nil, err
+	}
+	encodedResourceCollectionFilters, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyResourceCollectionFilters)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListDomainAlias GetConfigTableValueOrNil for OpenGovernanceConfigKeyResourceCollectionFilters", "error", err)
+		return nil, err
+	}
+	clientType, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyClientType)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListDomainAlias GetConfigTableValueOrNil for OpenGovernanceConfigKeyClientType", "error", err)
+		return nil, err
+	}
+
+	paginator, err := k.NewDomainAliasPaginator(essdk.BuildFilter(ctx, d.QueryContext, listDomainAliasFilters, "googleworkspace", accountId, encodedResourceCollectionFilters, clientType), d.QueryContext.Limit)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListDomainAlias NewDomainAliasPaginator", "error", err)
+		return nil, err
+	}
+
+	for paginator.HasNext() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			plugin.Logger(ctx).Error("ListDomainAlias paginator.NextPage", "error", err)
+			return nil, err
+		}
+
+		for _, v := range page {
+			d.StreamListItem(ctx, v)
+		}
+	}
+
+	err = paginator.Close(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+var getDomainAliasFilters = map[string]string{}
+
+func GetDomainAlias(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("GetDomainAlias")
+	runtime.GC()
+	// create service
+	cfg := essdk.GetConfig(d.Connection)
+	ke, err := essdk.NewClientCached(cfg, d.ConnectionCache, ctx)
+	if err != nil {
+		return nil, err
+	}
+	k := Client{Client: ke}
+
+	sc, err := steampipesdk.NewSelfClientCached(ctx, d.ConnectionCache)
+	if err != nil {
+		return nil, err
+	}
+	accountId, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyAccountID)
+	if err != nil {
+		return nil, err
+	}
+	encodedResourceCollectionFilters, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyResourceCollectionFilters)
+	if err != nil {
+		return nil, err
+	}
+	clientType, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyClientType)
+	if err != nil {
+		return nil, err
+	}
+
+	limit := int64(1)
+	paginator, err := k.NewDomainAliasPaginator(essdk.BuildFilter(ctx, d.QueryContext, getDomainAliasFilters, "googleworkspace", accountId, encodedResourceCollectionFilters, clientType), &limit)
+	if err != nil {
+		return nil, err
+	}
+
+	for paginator.HasNext() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, v := range page {
+			return v, nil
+		}
+	}
+
+	err = paginator.Close(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+// ==========================  END: DomainAlias =============================
+
+// ==========================  START: GroupAlias =============================
+
+type GroupAlias struct {
+	ResourceID      string                                `json:"resource_id"`
+	PlatformID      string                                `json:"platform_id"`
+	Description     googleworkspace.GroupAliasDescription `json:"description"`
+	Metadata        googleworkspace.Metadata              `json:"metadata"`
+	DescribedBy     string                                `json:"described_by"`
+	ResourceType    string                                `json:"resource_type"`
+	IntegrationType string                                `json:"integration_type"`
+	IntegrationID   string                                `json:"integration_id"`
+}
+
+type GroupAliasHit struct {
+	ID      string        `json:"_id"`
+	Score   float64       `json:"_score"`
+	Index   string        `json:"_index"`
+	Type    string        `json:"_type"`
+	Version int64         `json:"_version,omitempty"`
+	Source  GroupAlias    `json:"_source"`
+	Sort    []interface{} `json:"sort"`
+}
+
+type GroupAliasHits struct {
+	Total essdk.SearchTotal `json:"total"`
+	Hits  []GroupAliasHit   `json:"hits"`
+}
+
+type GroupAliasSearchResponse struct {
+	PitID string         `json:"pit_id"`
+	Hits  GroupAliasHits `json:"hits"`
+}
+
+type GroupAliasPaginator struct {
+	paginator *essdk.BaseESPaginator
+}
+
+func (k Client) NewGroupAliasPaginator(filters []essdk.BoolFilter, limit *int64) (GroupAliasPaginator, error) {
+	paginator, err := essdk.NewPaginator(k.ES(), "googleworkspace_groupalias", filters, limit)
+	if err != nil {
+		return GroupAliasPaginator{}, err
+	}
+
+	p := GroupAliasPaginator{
+		paginator: paginator,
+	}
+
+	return p, nil
+}
+
+func (p GroupAliasPaginator) HasNext() bool {
+	return !p.paginator.Done()
+}
+
+func (p GroupAliasPaginator) Close(ctx context.Context) error {
+	return p.paginator.Deallocate(ctx)
+}
+
+func (p GroupAliasPaginator) NextPage(ctx context.Context) ([]GroupAlias, error) {
+	var response GroupAliasSearchResponse
+	err := p.paginator.Search(ctx, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	var values []GroupAlias
+	for _, hit := range response.Hits.Hits {
+		values = append(values, hit.Source)
+	}
+
+	hits := int64(len(response.Hits.Hits))
+	if hits > 0 {
+		p.paginator.UpdateState(hits, response.Hits.Hits[hits-1].Sort, response.PitID)
+	} else {
+		p.paginator.UpdateState(hits, nil, "")
+	}
+
+	return values, nil
+}
+
+var listGroupAliasFilters = map[string]string{}
+
+func ListGroupAlias(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("ListGroupAlias")
+	runtime.GC()
+
+	// create service
+	cfg := essdk.GetConfig(d.Connection)
+	ke, err := essdk.NewClientCached(cfg, d.ConnectionCache, ctx)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListGroupAlias NewClientCached", "error", err)
+		return nil, err
+	}
+	k := Client{Client: ke}
+
+	sc, err := steampipesdk.NewSelfClientCached(ctx, d.ConnectionCache)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListGroupAlias NewSelfClientCached", "error", err)
+		return nil, err
+	}
+	accountId, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyAccountID)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListGroupAlias GetConfigTableValueOrNil for OpenGovernanceConfigKeyAccountID", "error", err)
+		return nil, err
+	}
+	encodedResourceCollectionFilters, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyResourceCollectionFilters)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListGroupAlias GetConfigTableValueOrNil for OpenGovernanceConfigKeyResourceCollectionFilters", "error", err)
+		return nil, err
+	}
+	clientType, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyClientType)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListGroupAlias GetConfigTableValueOrNil for OpenGovernanceConfigKeyClientType", "error", err)
+		return nil, err
+	}
+
+	paginator, err := k.NewGroupAliasPaginator(essdk.BuildFilter(ctx, d.QueryContext, listGroupAliasFilters, "googleworkspace", accountId, encodedResourceCollectionFilters, clientType), d.QueryContext.Limit)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListGroupAlias NewGroupAliasPaginator", "error", err)
+		return nil, err
+	}
+
+	for paginator.HasNext() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			plugin.Logger(ctx).Error("ListGroupAlias paginator.NextPage", "error", err)
+			return nil, err
+		}
+
+		for _, v := range page {
+			d.StreamListItem(ctx, v)
+		}
+	}
+
+	err = paginator.Close(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+var getGroupAliasFilters = map[string]string{}
+
+func GetGroupAlias(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("GetGroupAlias")
+	runtime.GC()
+	// create service
+	cfg := essdk.GetConfig(d.Connection)
+	ke, err := essdk.NewClientCached(cfg, d.ConnectionCache, ctx)
+	if err != nil {
+		return nil, err
+	}
+	k := Client{Client: ke}
+
+	sc, err := steampipesdk.NewSelfClientCached(ctx, d.ConnectionCache)
+	if err != nil {
+		return nil, err
+	}
+	accountId, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyAccountID)
+	if err != nil {
+		return nil, err
+	}
+	encodedResourceCollectionFilters, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyResourceCollectionFilters)
+	if err != nil {
+		return nil, err
+	}
+	clientType, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyClientType)
+	if err != nil {
+		return nil, err
+	}
+
+	limit := int64(1)
+	paginator, err := k.NewGroupAliasPaginator(essdk.BuildFilter(ctx, d.QueryContext, getGroupAliasFilters, "googleworkspace", accountId, encodedResourceCollectionFilters, clientType), &limit)
+	if err != nil {
+		return nil, err
+	}
+
+	for paginator.HasNext() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, v := range page {
+			return v, nil
+		}
+	}
+
+	err = paginator.Close(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+// ==========================  END: GroupAlias =============================
+
+// ==========================  START: Privilege =============================
+
+type Privilege struct {
+	ResourceID      string                               `json:"resource_id"`
+	PlatformID      string                               `json:"platform_id"`
+	Description     googleworkspace.PrivilegeDescription `json:"description"`
+	Metadata        googleworkspace.Metadata             `json:"metadata"`
+	DescribedBy     string                               `json:"described_by"`
+	ResourceType    string                               `json:"resource_type"`
+	IntegrationType string                               `json:"integration_type"`
+	IntegrationID   string                               `json:"integration_id"`
+}
+
+type PrivilegeHit struct {
+	ID      string        `json:"_id"`
+	Score   float64       `json:"_score"`
+	Index   string        `json:"_index"`
+	Type    string        `json:"_type"`
+	Version int64         `json:"_version,omitempty"`
+	Source  Privilege     `json:"_source"`
+	Sort    []interface{} `json:"sort"`
+}
+
+type PrivilegeHits struct {
+	Total essdk.SearchTotal `json:"total"`
+	Hits  []PrivilegeHit    `json:"hits"`
+}
+
+type PrivilegeSearchResponse struct {
+	PitID string        `json:"pit_id"`
+	Hits  PrivilegeHits `json:"hits"`
+}
+
+type PrivilegePaginator struct {
+	paginator *essdk.BaseESPaginator
+}
+
+func (k Client) NewPrivilegePaginator(filters []essdk.BoolFilter, limit *int64) (PrivilegePaginator, error) {
+	paginator, err := essdk.NewPaginator(k.ES(), "googleworkspace_privilege", filters, limit)
+	if err != nil {
+		return PrivilegePaginator{}, err
+	}
+
+	p := PrivilegePaginator{
+		paginator: paginator,
+	}
+
+	return p, nil
+}
+
+func (p PrivilegePaginator) HasNext() bool {
+	return !p.paginator.Done()
+}
+
+func (p PrivilegePaginator) Close(ctx context.Context) error {
+	return p.paginator.Deallocate(ctx)
+}
+
+func (p PrivilegePaginator) NextPage(ctx context.Context) ([]Privilege, error) {
+	var response PrivilegeSearchResponse
+	err := p.paginator.Search(ctx, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	var values []Privilege
+	for _, hit := range response.Hits.Hits {
+		values = append(values, hit.Source)
+	}
+
+	hits := int64(len(response.Hits.Hits))
+	if hits > 0 {
+		p.paginator.UpdateState(hits, response.Hits.Hits[hits-1].Sort, response.PitID)
+	} else {
+		p.paginator.UpdateState(hits, nil, "")
+	}
+
+	return values, nil
+}
+
+var listPrivilegeFilters = map[string]string{}
+
+func ListPrivilege(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("ListPrivilege")
+	runtime.GC()
+
+	// create service
+	cfg := essdk.GetConfig(d.Connection)
+	ke, err := essdk.NewClientCached(cfg, d.ConnectionCache, ctx)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListPrivilege NewClientCached", "error", err)
+		return nil, err
+	}
+	k := Client{Client: ke}
+
+	sc, err := steampipesdk.NewSelfClientCached(ctx, d.ConnectionCache)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListPrivilege NewSelfClientCached", "error", err)
+		return nil, err
+	}
+	accountId, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyAccountID)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListPrivilege GetConfigTableValueOrNil for OpenGovernanceConfigKeyAccountID", "error", err)
+		return nil, err
+	}
+	encodedResourceCollectionFilters, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyResourceCollectionFilters)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListPrivilege GetConfigTableValueOrNil for OpenGovernanceConfigKeyResourceCollectionFilters", "error", err)
+		return nil, err
+	}
+	clientType, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyClientType)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListPrivilege GetConfigTableValueOrNil for OpenGovernanceConfigKeyClientType", "error", err)
+		return nil, err
+	}
+
+	paginator, err := k.NewPrivilegePaginator(essdk.BuildFilter(ctx, d.QueryContext, listPrivilegeFilters, "googleworkspace", accountId, encodedResourceCollectionFilters, clientType), d.QueryContext.Limit)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListPrivilege NewPrivilegePaginator", "error", err)
+		return nil, err
+	}
+
+	for paginator.HasNext() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			plugin.Logger(ctx).Error("ListPrivilege paginator.NextPage", "error", err)
+			return nil, err
+		}
+
+		for _, v := range page {
+			d.StreamListItem(ctx, v)
+		}
+	}
+
+	err = paginator.Close(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+var getPrivilegeFilters = map[string]string{}
+
+func GetPrivilege(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("GetPrivilege")
+	runtime.GC()
+	// create service
+	cfg := essdk.GetConfig(d.Connection)
+	ke, err := essdk.NewClientCached(cfg, d.ConnectionCache, ctx)
+	if err != nil {
+		return nil, err
+	}
+	k := Client{Client: ke}
+
+	sc, err := steampipesdk.NewSelfClientCached(ctx, d.ConnectionCache)
+	if err != nil {
+		return nil, err
+	}
+	accountId, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyAccountID)
+	if err != nil {
+		return nil, err
+	}
+	encodedResourceCollectionFilters, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyResourceCollectionFilters)
+	if err != nil {
+		return nil, err
+	}
+	clientType, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyClientType)
+	if err != nil {
+		return nil, err
+	}
+
+	limit := int64(1)
+	paginator, err := k.NewPrivilegePaginator(essdk.BuildFilter(ctx, d.QueryContext, getPrivilegeFilters, "googleworkspace", accountId, encodedResourceCollectionFilters, clientType), &limit)
+	if err != nil {
+		return nil, err
+	}
+
+	for paginator.HasNext() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, v := range page {
+			return v, nil
+		}
+	}
+
+	err = paginator.Close(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+// ==========================  END: Privilege =============================
+
+// ==========================  START: ResourceBuilding =============================
+
+type ResourceBuilding struct {
+	ResourceID      string                                      `json:"resource_id"`
+	PlatformID      string                                      `json:"platform_id"`
+	Description     googleworkspace.ResourceBuildingDescription `json:"description"`
+	Metadata        googleworkspace.Metadata                    `json:"metadata"`
+	DescribedBy     string                                      `json:"described_by"`
+	ResourceType    string                                      `json:"resource_type"`
+	IntegrationType string                                      `json:"integration_type"`
+	IntegrationID   string                                      `json:"integration_id"`
+}
+
+type ResourceBuildingHit struct {
+	ID      string           `json:"_id"`
+	Score   float64          `json:"_score"`
+	Index   string           `json:"_index"`
+	Type    string           `json:"_type"`
+	Version int64            `json:"_version,omitempty"`
+	Source  ResourceBuilding `json:"_source"`
+	Sort    []interface{}    `json:"sort"`
+}
+
+type ResourceBuildingHits struct {
+	Total essdk.SearchTotal     `json:"total"`
+	Hits  []ResourceBuildingHit `json:"hits"`
+}
+
+type ResourceBuildingSearchResponse struct {
+	PitID string               `json:"pit_id"`
+	Hits  ResourceBuildingHits `json:"hits"`
+}
+
+type ResourceBuildingPaginator struct {
+	paginator *essdk.BaseESPaginator
+}
+
+func (k Client) NewResourceBuildingPaginator(filters []essdk.BoolFilter, limit *int64) (ResourceBuildingPaginator, error) {
+	paginator, err := essdk.NewPaginator(k.ES(), "googleworkspace_resourcebuilding", filters, limit)
+	if err != nil {
+		return ResourceBuildingPaginator{}, err
+	}
+
+	p := ResourceBuildingPaginator{
+		paginator: paginator,
+	}
+
+	return p, nil
+}
+
+func (p ResourceBuildingPaginator) HasNext() bool {
+	return !p.paginator.Done()
+}
+
+func (p ResourceBuildingPaginator) Close(ctx context.Context) error {
+	return p.paginator.Deallocate(ctx)
+}
+
+func (p ResourceBuildingPaginator) NextPage(ctx context.Context) ([]ResourceBuilding, error) {
+	var response ResourceBuildingSearchResponse
+	err := p.paginator.Search(ctx, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	var values []ResourceBuilding
+	for _, hit := range response.Hits.Hits {
+		values = append(values, hit.Source)
+	}
+
+	hits := int64(len(response.Hits.Hits))
+	if hits > 0 {
+		p.paginator.UpdateState(hits, response.Hits.Hits[hits-1].Sort, response.PitID)
+	} else {
+		p.paginator.UpdateState(hits, nil, "")
+	}
+
+	return values, nil
+}
+
+var listResourceBuildingFilters = map[string]string{}
+
+func ListResourceBuilding(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("ListResourceBuilding")
+	runtime.GC()
+
+	// create service
+	cfg := essdk.GetConfig(d.Connection)
+	ke, err := essdk.NewClientCached(cfg, d.ConnectionCache, ctx)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceBuilding NewClientCached", "error", err)
+		return nil, err
+	}
+	k := Client{Client: ke}
+
+	sc, err := steampipesdk.NewSelfClientCached(ctx, d.ConnectionCache)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceBuilding NewSelfClientCached", "error", err)
+		return nil, err
+	}
+	accountId, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyAccountID)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceBuilding GetConfigTableValueOrNil for OpenGovernanceConfigKeyAccountID", "error", err)
+		return nil, err
+	}
+	encodedResourceCollectionFilters, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyResourceCollectionFilters)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceBuilding GetConfigTableValueOrNil for OpenGovernanceConfigKeyResourceCollectionFilters", "error", err)
+		return nil, err
+	}
+	clientType, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyClientType)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceBuilding GetConfigTableValueOrNil for OpenGovernanceConfigKeyClientType", "error", err)
+		return nil, err
+	}
+
+	paginator, err := k.NewResourceBuildingPaginator(essdk.BuildFilter(ctx, d.QueryContext, listResourceBuildingFilters, "googleworkspace", accountId, encodedResourceCollectionFilters, clientType), d.QueryContext.Limit)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceBuilding NewResourceBuildingPaginator", "error", err)
+		return nil, err
+	}
+
+	for paginator.HasNext() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			plugin.Logger(ctx).Error("ListResourceBuilding paginator.NextPage", "error", err)
+			return nil, err
+		}
+
+		for _, v := range page {
+			d.StreamListItem(ctx, v)
+		}
+	}
+
+	err = paginator.Close(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+var getResourceBuildingFilters = map[string]string{}
+
+func GetResourceBuilding(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("GetResourceBuilding")
+	runtime.GC()
+	// create service
+	cfg := essdk.GetConfig(d.Connection)
+	ke, err := essdk.NewClientCached(cfg, d.ConnectionCache, ctx)
+	if err != nil {
+		return nil, err
+	}
+	k := Client{Client: ke}
+
+	sc, err := steampipesdk.NewSelfClientCached(ctx, d.ConnectionCache)
+	if err != nil {
+		return nil, err
+	}
+	accountId, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyAccountID)
+	if err != nil {
+		return nil, err
+	}
+	encodedResourceCollectionFilters, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyResourceCollectionFilters)
+	if err != nil {
+		return nil, err
+	}
+	clientType, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyClientType)
+	if err != nil {
+		return nil, err
+	}
+
+	limit := int64(1)
+	paginator, err := k.NewResourceBuildingPaginator(essdk.BuildFilter(ctx, d.QueryContext, getResourceBuildingFilters, "googleworkspace", accountId, encodedResourceCollectionFilters, clientType), &limit)
+	if err != nil {
+		return nil, err
+	}
+
+	for paginator.HasNext() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, v := range page {
+			return v, nil
+		}
+	}
+
+	err = paginator.Close(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+// ==========================  END: ResourceBuilding =============================
+
+// ==========================  START: ResourceCalender =============================
+
+type ResourceCalender struct {
+	ResourceID      string                                      `json:"resource_id"`
+	PlatformID      string                                      `json:"platform_id"`
+	Description     googleworkspace.ResourceCalenderDescription `json:"description"`
+	Metadata        googleworkspace.Metadata                    `json:"metadata"`
+	DescribedBy     string                                      `json:"described_by"`
+	ResourceType    string                                      `json:"resource_type"`
+	IntegrationType string                                      `json:"integration_type"`
+	IntegrationID   string                                      `json:"integration_id"`
+}
+
+type ResourceCalenderHit struct {
+	ID      string           `json:"_id"`
+	Score   float64          `json:"_score"`
+	Index   string           `json:"_index"`
+	Type    string           `json:"_type"`
+	Version int64            `json:"_version,omitempty"`
+	Source  ResourceCalender `json:"_source"`
+	Sort    []interface{}    `json:"sort"`
+}
+
+type ResourceCalenderHits struct {
+	Total essdk.SearchTotal     `json:"total"`
+	Hits  []ResourceCalenderHit `json:"hits"`
+}
+
+type ResourceCalenderSearchResponse struct {
+	PitID string               `json:"pit_id"`
+	Hits  ResourceCalenderHits `json:"hits"`
+}
+
+type ResourceCalenderPaginator struct {
+	paginator *essdk.BaseESPaginator
+}
+
+func (k Client) NewResourceCalenderPaginator(filters []essdk.BoolFilter, limit *int64) (ResourceCalenderPaginator, error) {
+	paginator, err := essdk.NewPaginator(k.ES(), "googleworkspace_resourcecalender", filters, limit)
+	if err != nil {
+		return ResourceCalenderPaginator{}, err
+	}
+
+	p := ResourceCalenderPaginator{
+		paginator: paginator,
+	}
+
+	return p, nil
+}
+
+func (p ResourceCalenderPaginator) HasNext() bool {
+	return !p.paginator.Done()
+}
+
+func (p ResourceCalenderPaginator) Close(ctx context.Context) error {
+	return p.paginator.Deallocate(ctx)
+}
+
+func (p ResourceCalenderPaginator) NextPage(ctx context.Context) ([]ResourceCalender, error) {
+	var response ResourceCalenderSearchResponse
+	err := p.paginator.Search(ctx, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	var values []ResourceCalender
+	for _, hit := range response.Hits.Hits {
+		values = append(values, hit.Source)
+	}
+
+	hits := int64(len(response.Hits.Hits))
+	if hits > 0 {
+		p.paginator.UpdateState(hits, response.Hits.Hits[hits-1].Sort, response.PitID)
+	} else {
+		p.paginator.UpdateState(hits, nil, "")
+	}
+
+	return values, nil
+}
+
+var listResourceCalenderFilters = map[string]string{}
+
+func ListResourceCalender(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("ListResourceCalender")
+	runtime.GC()
+
+	// create service
+	cfg := essdk.GetConfig(d.Connection)
+	ke, err := essdk.NewClientCached(cfg, d.ConnectionCache, ctx)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceCalender NewClientCached", "error", err)
+		return nil, err
+	}
+	k := Client{Client: ke}
+
+	sc, err := steampipesdk.NewSelfClientCached(ctx, d.ConnectionCache)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceCalender NewSelfClientCached", "error", err)
+		return nil, err
+	}
+	accountId, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyAccountID)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceCalender GetConfigTableValueOrNil for OpenGovernanceConfigKeyAccountID", "error", err)
+		return nil, err
+	}
+	encodedResourceCollectionFilters, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyResourceCollectionFilters)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceCalender GetConfigTableValueOrNil for OpenGovernanceConfigKeyResourceCollectionFilters", "error", err)
+		return nil, err
+	}
+	clientType, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyClientType)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceCalender GetConfigTableValueOrNil for OpenGovernanceConfigKeyClientType", "error", err)
+		return nil, err
+	}
+
+	paginator, err := k.NewResourceCalenderPaginator(essdk.BuildFilter(ctx, d.QueryContext, listResourceCalenderFilters, "googleworkspace", accountId, encodedResourceCollectionFilters, clientType), d.QueryContext.Limit)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceCalender NewResourceCalenderPaginator", "error", err)
+		return nil, err
+	}
+
+	for paginator.HasNext() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			plugin.Logger(ctx).Error("ListResourceCalender paginator.NextPage", "error", err)
+			return nil, err
+		}
+
+		for _, v := range page {
+			d.StreamListItem(ctx, v)
+		}
+	}
+
+	err = paginator.Close(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+var getResourceCalenderFilters = map[string]string{}
+
+func GetResourceCalender(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("GetResourceCalender")
+	runtime.GC()
+	// create service
+	cfg := essdk.GetConfig(d.Connection)
+	ke, err := essdk.NewClientCached(cfg, d.ConnectionCache, ctx)
+	if err != nil {
+		return nil, err
+	}
+	k := Client{Client: ke}
+
+	sc, err := steampipesdk.NewSelfClientCached(ctx, d.ConnectionCache)
+	if err != nil {
+		return nil, err
+	}
+	accountId, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyAccountID)
+	if err != nil {
+		return nil, err
+	}
+	encodedResourceCollectionFilters, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyResourceCollectionFilters)
+	if err != nil {
+		return nil, err
+	}
+	clientType, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyClientType)
+	if err != nil {
+		return nil, err
+	}
+
+	limit := int64(1)
+	paginator, err := k.NewResourceCalenderPaginator(essdk.BuildFilter(ctx, d.QueryContext, getResourceCalenderFilters, "googleworkspace", accountId, encodedResourceCollectionFilters, clientType), &limit)
+	if err != nil {
+		return nil, err
+	}
+
+	for paginator.HasNext() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, v := range page {
+			return v, nil
+		}
+	}
+
+	err = paginator.Close(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+// ==========================  END: ResourceCalender =============================
+
+// ==========================  START: ResourceFeature =============================
+
+type ResourceFeature struct {
+	ResourceID      string                                     `json:"resource_id"`
+	PlatformID      string                                     `json:"platform_id"`
+	Description     googleworkspace.ResourceFeatureDescription `json:"description"`
+	Metadata        googleworkspace.Metadata                   `json:"metadata"`
+	DescribedBy     string                                     `json:"described_by"`
+	ResourceType    string                                     `json:"resource_type"`
+	IntegrationType string                                     `json:"integration_type"`
+	IntegrationID   string                                     `json:"integration_id"`
+}
+
+type ResourceFeatureHit struct {
+	ID      string          `json:"_id"`
+	Score   float64         `json:"_score"`
+	Index   string          `json:"_index"`
+	Type    string          `json:"_type"`
+	Version int64           `json:"_version,omitempty"`
+	Source  ResourceFeature `json:"_source"`
+	Sort    []interface{}   `json:"sort"`
+}
+
+type ResourceFeatureHits struct {
+	Total essdk.SearchTotal    `json:"total"`
+	Hits  []ResourceFeatureHit `json:"hits"`
+}
+
+type ResourceFeatureSearchResponse struct {
+	PitID string              `json:"pit_id"`
+	Hits  ResourceFeatureHits `json:"hits"`
+}
+
+type ResourceFeaturePaginator struct {
+	paginator *essdk.BaseESPaginator
+}
+
+func (k Client) NewResourceFeaturePaginator(filters []essdk.BoolFilter, limit *int64) (ResourceFeaturePaginator, error) {
+	paginator, err := essdk.NewPaginator(k.ES(), "googleworkspace_resourcefeature", filters, limit)
+	if err != nil {
+		return ResourceFeaturePaginator{}, err
+	}
+
+	p := ResourceFeaturePaginator{
+		paginator: paginator,
+	}
+
+	return p, nil
+}
+
+func (p ResourceFeaturePaginator) HasNext() bool {
+	return !p.paginator.Done()
+}
+
+func (p ResourceFeaturePaginator) Close(ctx context.Context) error {
+	return p.paginator.Deallocate(ctx)
+}
+
+func (p ResourceFeaturePaginator) NextPage(ctx context.Context) ([]ResourceFeature, error) {
+	var response ResourceFeatureSearchResponse
+	err := p.paginator.Search(ctx, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	var values []ResourceFeature
+	for _, hit := range response.Hits.Hits {
+		values = append(values, hit.Source)
+	}
+
+	hits := int64(len(response.Hits.Hits))
+	if hits > 0 {
+		p.paginator.UpdateState(hits, response.Hits.Hits[hits-1].Sort, response.PitID)
+	} else {
+		p.paginator.UpdateState(hits, nil, "")
+	}
+
+	return values, nil
+}
+
+var listResourceFeatureFilters = map[string]string{}
+
+func ListResourceFeature(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("ListResourceFeature")
+	runtime.GC()
+
+	// create service
+	cfg := essdk.GetConfig(d.Connection)
+	ke, err := essdk.NewClientCached(cfg, d.ConnectionCache, ctx)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceFeature NewClientCached", "error", err)
+		return nil, err
+	}
+	k := Client{Client: ke}
+
+	sc, err := steampipesdk.NewSelfClientCached(ctx, d.ConnectionCache)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceFeature NewSelfClientCached", "error", err)
+		return nil, err
+	}
+	accountId, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyAccountID)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceFeature GetConfigTableValueOrNil for OpenGovernanceConfigKeyAccountID", "error", err)
+		return nil, err
+	}
+	encodedResourceCollectionFilters, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyResourceCollectionFilters)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceFeature GetConfigTableValueOrNil for OpenGovernanceConfigKeyResourceCollectionFilters", "error", err)
+		return nil, err
+	}
+	clientType, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyClientType)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceFeature GetConfigTableValueOrNil for OpenGovernanceConfigKeyClientType", "error", err)
+		return nil, err
+	}
+
+	paginator, err := k.NewResourceFeaturePaginator(essdk.BuildFilter(ctx, d.QueryContext, listResourceFeatureFilters, "googleworkspace", accountId, encodedResourceCollectionFilters, clientType), d.QueryContext.Limit)
+	if err != nil {
+		plugin.Logger(ctx).Error("ListResourceFeature NewResourceFeaturePaginator", "error", err)
+		return nil, err
+	}
+
+	for paginator.HasNext() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			plugin.Logger(ctx).Error("ListResourceFeature paginator.NextPage", "error", err)
+			return nil, err
+		}
+
+		for _, v := range page {
+			d.StreamListItem(ctx, v)
+		}
+	}
+
+	err = paginator.Close(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+var getResourceFeatureFilters = map[string]string{}
+
+func GetResourceFeature(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("GetResourceFeature")
+	runtime.GC()
+	// create service
+	cfg := essdk.GetConfig(d.Connection)
+	ke, err := essdk.NewClientCached(cfg, d.ConnectionCache, ctx)
+	if err != nil {
+		return nil, err
+	}
+	k := Client{Client: ke}
+
+	sc, err := steampipesdk.NewSelfClientCached(ctx, d.ConnectionCache)
+	if err != nil {
+		return nil, err
+	}
+	accountId, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyAccountID)
+	if err != nil {
+		return nil, err
+	}
+	encodedResourceCollectionFilters, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyResourceCollectionFilters)
+	if err != nil {
+		return nil, err
+	}
+	clientType, err := sc.GetConfigTableValueOrNil(ctx, steampipesdk.OpenGovernanceConfigKeyClientType)
+	if err != nil {
+		return nil, err
+	}
+
+	limit := int64(1)
+	paginator, err := k.NewResourceFeaturePaginator(essdk.BuildFilter(ctx, d.QueryContext, getResourceFeatureFilters, "googleworkspace", accountId, encodedResourceCollectionFilters, clientType), &limit)
+	if err != nil {
+		return nil, err
+	}
+
+	for paginator.HasNext() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, v := range page {
+			return v, nil
+		}
+	}
+
+	err = paginator.Close(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+// ==========================  END: ResourceFeature =============================

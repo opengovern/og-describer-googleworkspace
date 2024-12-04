@@ -69,7 +69,7 @@ func processUsers(ctx context.Context, handler *GoogleWorkspaceAPIHandler, Googl
 	pageToken := ""
 
 	for {
-		req := handler.Service.Users.List().Customer(handler.CustomerID).MaxResults(MaxPageResultsUsers)
+		req := handler.AdminService.Users.List().Customer(handler.CustomerID).MaxResults(MaxPageResultsUsers)
 		if pageToken != "" {
 			req.PageToken(pageToken)
 		}
@@ -119,7 +119,7 @@ func processUser(ctx context.Context, handler *GoogleWorkspaceAPIHandler, resour
 	var user *admin.User
 	var status *int
 
-	req := handler.Service.Users.Get(resourceID)
+	req := handler.AdminService.Users.Get(resourceID)
 
 	requestFunc := func() (*int, error) {
 		var e error

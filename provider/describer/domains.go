@@ -66,7 +66,7 @@ func GetDomain(ctx context.Context, handler *GoogleWorkspaceAPIHandler, resource
 func processDomains(ctx context.Context, handler *GoogleWorkspaceAPIHandler, GoogleWorkspaceChan chan<- models.Resource, wg *sync.WaitGroup) error {
 	var domainsResp *admin.Domains2
 
-	req := handler.Service.Domains.List(handler.CustomerID)
+	req := handler.AdminService.Domains.List(handler.CustomerID)
 
 	requestFunc := func() (*int, error) {
 		var e error
@@ -106,7 +106,7 @@ func processDomain(ctx context.Context, handler *GoogleWorkspaceAPIHandler, reso
 	var domain *admin.Domains
 	var status *int
 
-	req := handler.Service.Domains.Get(handler.CustomerID, resourceID)
+	req := handler.AdminService.Domains.Get(handler.CustomerID, resourceID)
 
 	requestFunc := func() (*int, error) {
 		var e error

@@ -70,7 +70,7 @@ func processRoles(ctx context.Context, handler *GoogleWorkspaceAPIHandler, Googl
 	pageToken := ""
 
 	for {
-		req := handler.Service.Roles.List(handler.CustomerID).MaxResults(MaxPageResultsRoles)
+		req := handler.AdminService.Roles.List(handler.CustomerID).MaxResults(MaxPageResultsRoles)
 		if pageToken != "" {
 			req.PageToken(pageToken)
 		}
@@ -120,7 +120,7 @@ func processRole(ctx context.Context, handler *GoogleWorkspaceAPIHandler, resour
 	var role *admin.Role
 	var status *int
 
-	req := handler.Service.Roles.Get(handler.CustomerID, resourceID)
+	req := handler.AdminService.Roles.Get(handler.CustomerID, resourceID)
 
 	requestFunc := func() (*int, error) {
 		var e error

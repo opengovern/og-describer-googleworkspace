@@ -54,7 +54,7 @@ func ListGroupAliases(ctx context.Context, handler *GoogleWorkspaceAPIHandler, s
 func processGroupAliases(ctx context.Context, handler *GoogleWorkspaceAPIHandler, GroupID string, GoogleWorkspaceChan chan<- models.Resource, wg *sync.WaitGroup) error {
 	var aliasesResp *admin.Aliases
 
-	req := handler.Service.Groups.Aliases.List(GroupID)
+	req := handler.AdminService.Groups.Aliases.List(GroupID)
 
 	requestFunc := func() (*int, error) {
 		var e error

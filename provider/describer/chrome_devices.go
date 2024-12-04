@@ -69,7 +69,7 @@ func processChromeDevices(ctx context.Context, handler *GoogleWorkspaceAPIHandle
 	pageToken := ""
 
 	for {
-		req := handler.Service.Chromeosdevices.List(handler.CustomerID).MaxResults(MaxPageResultsChromeDevices)
+		req := handler.AdminService.Chromeosdevices.List(handler.CustomerID).MaxResults(MaxPageResultsChromeDevices)
 		if pageToken != "" {
 			req.PageToken(pageToken)
 		}
@@ -119,7 +119,7 @@ func processChromeDevice(ctx context.Context, handler *GoogleWorkspaceAPIHandler
 	var chromeDevice *admin.ChromeOsDevice
 	var status *int
 
-	req := handler.Service.Chromeosdevices.Get(handler.CustomerID, resourceID)
+	req := handler.AdminService.Chromeosdevices.Get(handler.CustomerID, resourceID)
 
 	requestFunc := func() (*int, error) {
 		var e error
