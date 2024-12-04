@@ -16,7 +16,7 @@ func tableGoogleWorkspaceGroup(ctx context.Context) *plugin.Table {
 		Get: &plugin.GetConfig{
 			Hydrate: nil,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			// Top columns
 			{Name: "id", Type: proto.ColumnType_STRING, Description: "The unique ID of the group."},
 			{Name: "email", Type: proto.ColumnType_STRING, Description: "The email address of the group."},
@@ -30,6 +30,6 @@ func tableGoogleWorkspaceGroup(ctx context.Context) *plugin.Table {
 			// Aliases columns
 			{Name: "aliases", Type: proto.ColumnType_JSON, Description: "List of email aliases associated with the group."},
 			{Name: "nonEditableAliases", Type: proto.ColumnType_JSON, Description: "List of email aliases that cannot be edited."},
-		},
+		}),
 	}
 }

@@ -240,29 +240,13 @@ func tableGoogleWorkspaceCalendarEvent(_ context.Context) *plugin.Table {
 		Name:        "googleworkspace_calendar_event",
 		Description: "Events scheduled on the specified calendar.",
 		List: &plugin.ListConfig{
-			Hydrate:           listCalendarEvents,
-			ShouldIgnoreError: isNotFoundError([]string{"404"}),
-			KeyColumns: []*plugin.KeyColumn{
-				{
-					Name:    "calendar_id",
-					Require: plugin.Required,
-				},
-				{
-					Name:    "query",
-					Require: plugin.Optional,
-				},
-				{
-					Name:      "start_time",
-					Require:   plugin.Optional,
-					Operators: []string{">", ">=", "=", "<", "<="},
-				},
-			},
+			Hydrate: listCalendarEvents,
 		},
 		Get: &plugin.GetConfig{
 			KeyColumns: plugin.AllColumns([]string{"calendar_id", "id"}),
 			Hydrate:    getCalendarEvent,
 		},
-		Columns: calendarEventColumns(),
+		Columns: commonColumns(calendarEventColumns()),
 	}
 }
 

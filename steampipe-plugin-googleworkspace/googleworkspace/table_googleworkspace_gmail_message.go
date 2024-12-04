@@ -22,32 +22,13 @@ func tableGoogleWorkspaceGmailMessage(_ context.Context) *plugin.Table {
 		Description: "Retrieves messages in the specified user's mailbox.",
 		List: &plugin.ListConfig{
 			Hydrate: listGmailMessages,
-			KeyColumns: []*plugin.KeyColumn{
-				{
-					Name:    "user_id",
-					Require: plugin.Required,
-				},
-				{
-					Name:    "sender_email",
-					Require: plugin.Optional,
-				},
-				{
-					Name:      "internal_date",
-					Require:   plugin.Optional,
-					Operators: []string{">", ">=", "=", "<", "<="},
-				},
-				{
-					Name:    "query",
-					Require: plugin.Optional,
-				},
-			},
 		},
 		Get: &plugin.GetConfig{
-			KeyColumns: 	plugin.AllColumns([]string{"id", "user_id"}),
-			Hydrate:    	getGmailMessage,
+			KeyColumns:     plugin.AllColumns([]string{"id", "user_id"}),
+			Hydrate:        getGmailMessage,
 			MaxConcurrency: 50,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			{
 				Name:        "id",
 				Description: "The immutable ID of the message.",
@@ -120,7 +101,7 @@ func tableGoogleWorkspaceGmailMessage(_ context.Context) *plugin.Table {
 				Type:        proto.ColumnType_JSON,
 				Hydrate:     getGmailMessage,
 			},
-		},
+		}),
 	}
 }
 

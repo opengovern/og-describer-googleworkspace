@@ -24,31 +24,12 @@ func tableGoogleWorkspaceDrive(_ context.Context) *plugin.Table {
 		Description: "Drives defined user's shared drives in the Google Drive.",
 		List: &plugin.ListConfig{
 			Hydrate: listDrives,
-			KeyColumns: []*plugin.KeyColumn{
-				{
-					Name:    "name",
-					Require: plugin.Optional,
-				},
-				{
-					Name:      "created_time",
-					Require:   plugin.Optional,
-					Operators: []string{">", ">=", "=", "<", "<="},
-				},
-				{
-					Name:    "use_domain_admin_access",
-					Require: plugin.Optional,
-				},
-				{
-					Name:    "query",
-					Require: plugin.Optional,
-				},
-			},
 		},
 		Get: &plugin.GetConfig{
 			KeyColumns: plugin.SingleColumn("id"),
 			Hydrate:    getDrive,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			{
 				Name:        "id",
 				Description: "The ID of this shared drive which is also the ID of the top level folder of this shared drive.",
@@ -130,7 +111,7 @@ func tableGoogleWorkspaceDrive(_ context.Context) *plugin.Table {
 				Description: "Describes the capabilities the current user has on this shared drive.",
 				Type:        proto.ColumnType_JSON,
 			},
-		},
+		}),
 	}
 }
 

@@ -21,28 +21,13 @@ func tableGoogleWorkspaceGmailMyMessage(_ context.Context) *plugin.Table {
 		Description: "Retrieves messages in the current authenticated user's mailbox.",
 		List: &plugin.ListConfig{
 			Hydrate: listGmailMyMessages,
-			KeyColumns: []*plugin.KeyColumn{
-				{
-					Name:    "sender_email",
-					Require: plugin.Optional,
-				},
-				{
-					Name:      "internal_date",
-					Require:   plugin.Optional,
-					Operators: []string{">", ">=", "=", "<", "<="},
-				},
-				{
-					Name:    "query",
-					Require: plugin.Optional,
-				},
-			},
 		},
 		Get: &plugin.GetConfig{
-			KeyColumns: 	plugin.SingleColumn("id"),
-			Hydrate:    	getGmailMyMessage,
+			KeyColumns:     plugin.SingleColumn("id"),
+			Hydrate:        getGmailMyMessage,
 			MaxConcurrency: 50,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			{
 				Name:        "id",
 				Description: "The immutable ID of the message.",
@@ -109,7 +94,7 @@ func tableGoogleWorkspaceGmailMyMessage(_ context.Context) *plugin.Table {
 				Type:        proto.ColumnType_JSON,
 				Hydrate:     getGmailMyMessage,
 			},
-		},
+		}),
 	}
 }
 

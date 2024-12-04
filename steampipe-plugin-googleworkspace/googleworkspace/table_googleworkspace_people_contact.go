@@ -142,10 +142,9 @@ func tableGoogleWorkspacePeopleContact(_ context.Context) *plugin.Table {
 		Name:        "googleworkspace_people_contact",
 		Description: "Contacts owned by the authenticated user.",
 		List: &plugin.ListConfig{
-			Hydrate:           listPeopleContacts,
-			ShouldIgnoreError: isNotFoundError([]string{"404"}),
+			Hydrate: listPeopleContacts,
 		},
-		Columns: peopleContacts(),
+		Columns: commonColumns(peopleContacts()),
 	}
 }
 

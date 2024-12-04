@@ -21,23 +21,12 @@ func tableGoogleWorkspaceGmailMyDraft(_ context.Context) *plugin.Table {
 		Description: "Retrieves draft messages in the current authenticated user's mailbox.",
 		List: &plugin.ListConfig{
 			Hydrate: listGmailMyDrafts,
-			KeyColumns: []*plugin.KeyColumn{
-				{
-					Name:      "message_internal_date",
-					Require:   plugin.Optional,
-					Operators: []string{">", ">=", "=", "<", "<="},
-				},
-				{
-					Name:    "query",
-					Require: plugin.Optional,
-				},
-			},
 		},
 		Get: &plugin.GetConfig{
 			KeyColumns: plugin.SingleColumn("draft_id"),
 			Hydrate:    getGmailMyDraft,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			{
 				Name:        "draft_id",
 				Description: "The immutable ID of the draft.",
@@ -111,7 +100,7 @@ func tableGoogleWorkspaceGmailMyDraft(_ context.Context) *plugin.Table {
 				Hydrate:     getGmailMyDraft,
 				Transform:   transform.FromField("Message.Payload"),
 			},
-		},
+		}),
 	}
 }
 

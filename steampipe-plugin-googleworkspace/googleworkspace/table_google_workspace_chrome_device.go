@@ -16,7 +16,7 @@ func tableGoogleWorkspaceChromeDevice(ctx context.Context) *plugin.Table {
 		Get: &plugin.GetConfig{
 			Hydrate: nil,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			// Top columns
 			{Name: "deviceId", Type: proto.ColumnType_STRING, Description: "Unique device identifier."},
 			{Name: "serialNumber", Type: proto.ColumnType_STRING, Description: "The serial number of the device."},
@@ -69,6 +69,6 @@ func tableGoogleWorkspaceChromeDevice(ctx context.Context) *plugin.Table {
 			{Name: "extendedSupportEnabled", Type: proto.ColumnType_BOOL, Description: "Indicates if extended support is enabled."},
 			{Name: "chromeOsType", Type: proto.ColumnType_STRING, Description: "The type of Chrome OS running on the device."},
 			{Name: "diskSpaceUsage", Type: proto.ColumnType_JSON, Description: "Disk space usage details for the device."},
-		},
+		}),
 	}
 }

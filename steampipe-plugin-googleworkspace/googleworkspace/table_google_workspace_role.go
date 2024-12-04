@@ -16,7 +16,7 @@ func tableGoogleWorkspaceRole(ctx context.Context) *plugin.Table {
 		Get: &plugin.GetConfig{
 			Hydrate: nil,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			// Top columns
 			{Name: "roleId", Type: proto.ColumnType_STRING, Description: "The unique identifier of the role."},
 			{Name: "roleName", Type: proto.ColumnType_STRING, Description: "The name of the role."},
@@ -28,6 +28,6 @@ func tableGoogleWorkspaceRole(ctx context.Context) *plugin.Table {
 
 			// JSON column for role privileges
 			{Name: "rolePrivileges", Type: proto.ColumnType_JSON, Description: "List of privileges associated with the role."},
-		},
+		}),
 	}
 }

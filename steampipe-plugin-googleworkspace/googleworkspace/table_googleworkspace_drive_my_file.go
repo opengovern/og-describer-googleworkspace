@@ -316,32 +316,12 @@ func tableGoogleWorkspaceDriveMyFile(_ context.Context) *plugin.Table {
 		Description: "Retrieves file's metadata or content owned by an user.",
 		List: &plugin.ListConfig{
 			Hydrate: listDriveMyFiles,
-			KeyColumns: []*plugin.KeyColumn{
-				{
-					Name:    "name",
-					Require: plugin.Optional,
-				},
-				{
-					Name:      "created_time",
-					Require:   plugin.Optional,
-					Operators: []string{">", ">=", "=", "<", "<="},
-				},
-				{
-					Name:      "mime_type",
-					Require:   plugin.Optional,
-					Operators: []string{"=", "<>", "!="},
-				},
-				{
-					Name:    "query",
-					Require: plugin.Optional,
-				},
-			},
 		},
 		Get: &plugin.GetConfig{
 			KeyColumns: plugin.SingleColumn("id"),
 			Hydrate:    getDriveMyFile,
 		},
-		Columns: driveFileColumns(),
+		Columns: commonColumns(driveFileColumns()),
 	}
 }
 

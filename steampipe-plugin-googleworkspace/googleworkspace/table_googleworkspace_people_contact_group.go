@@ -18,15 +18,8 @@ func tableGoogleWorkspacePeopleContactGroup(_ context.Context) *plugin.Table {
 		Description: "Contact groups owned by the authenticated user",
 		List: &plugin.ListConfig{
 			Hydrate: listPeopleContactGroups,
-			KeyColumns: []*plugin.KeyColumn{
-				{
-					Name:    "max_members",
-					Require: plugin.Optional,
-				},
-			},
-			ShouldIgnoreError: isNotFoundError([]string{"404"}),
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			{
 				Name:        "resource_name",
 				Description: "The resource name for the contact group, assigned by the server.",
@@ -81,7 +74,7 @@ func tableGoogleWorkspacePeopleContactGroup(_ context.Context) *plugin.Table {
 				Description: "A list of contact person resource names that are members of the contact group.",
 				Type:        proto.ColumnType_JSON,
 			},
-		},
+		}),
 	}
 }
 

@@ -16,7 +16,7 @@ func tableGoogleWorkspaceMobileDevice(ctx context.Context) *plugin.Table {
 		Get: &plugin.GetConfig{
 			Hydrate: nil,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			// Top columns
 			{Name: "kind", Type: proto.ColumnType_STRING, Description: "The type of the device (e.g., android_device)."},
 			{Name: "etag", Type: proto.ColumnType_STRING, Description: "The etag identifier for the resource."},
@@ -57,6 +57,6 @@ func tableGoogleWorkspaceMobileDevice(ctx context.Context) *plugin.Table {
 
 			// JSON column for applications
 			{Name: "applications", Type: proto.ColumnType_JSON, Description: "List of installed applications on the device."},
-		},
+		}),
 	}
 }

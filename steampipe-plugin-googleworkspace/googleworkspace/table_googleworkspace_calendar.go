@@ -15,11 +15,9 @@ func tableGoogleWorkspaceCalendar(_ context.Context) *plugin.Table {
 		Name:        "googleworkspace_calendar",
 		Description: "Metadata of the specified calendar.",
 		List: &plugin.ListConfig{
-			Hydrate:           listCalendars,
-			KeyColumns:        plugin.SingleColumn("id"),
-			ShouldIgnoreError: isNotFoundError([]string{"404"}),
+			Hydrate: listCalendars,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			{
 				Name:        "id",
 				Description: "Identifier of the calendar.",
@@ -56,7 +54,7 @@ func tableGoogleWorkspaceCalendar(_ context.Context) *plugin.Table {
 				Description: "Describes the conferencing properties for this calendar.",
 				Type:        proto.ColumnType_JSON,
 			},
-		},
+		}),
 	}
 }
 
