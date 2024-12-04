@@ -16,7 +16,7 @@ func tableGoogleWorkspaceRoleAssignment(ctx context.Context) *plugin.Table {
 		Get: &plugin.GetConfig{
 			Hydrate: nil,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			// Top columns
 			{Name: "roleAssignmentId", Type: proto.ColumnType_STRING, Description: "The unique identifier of the role assignment."},
 			{Name: "roleId", Type: proto.ColumnType_STRING, Description: "The ID of the assigned role."},
@@ -27,6 +27,6 @@ func tableGoogleWorkspaceRoleAssignment(ctx context.Context) *plugin.Table {
 			{Name: "scopeType", Type: proto.ColumnType_STRING, Description: "The scope type of the assignment (e.g., ORGANIZATION, UNIT, etc.)."},
 			{Name: "orgUnitId", Type: proto.ColumnType_STRING, Description: "The ID of the organizational unit to which the role is assigned."},
 			{Name: "condition", Type: proto.ColumnType_STRING, Description: "A condition that must be met for the role assignment to apply."},
-		},
+		}),
 	}
 }

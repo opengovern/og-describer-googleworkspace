@@ -16,7 +16,7 @@ func tableGoogleWorkspaceResourceCalender(ctx context.Context) *plugin.Table {
 		Get: &plugin.GetConfig{
 			Hydrate: nil,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			// Top columns
 			{Name: "kind", Type: proto.ColumnType_STRING, Description: "The kind of resource."},
 			{Name: "etags", Type: proto.ColumnType_STRING, Description: "The etag identifier for the resource."},
@@ -37,6 +37,6 @@ func tableGoogleWorkspaceResourceCalender(ctx context.Context) *plugin.Table {
 
 			// Feature instances - JSON column
 			{Name: "featureInstances", Type: proto.ColumnType_JSON, Description: "Feature instances associated with the resource."},
-		},
+		}),
 	}
 }

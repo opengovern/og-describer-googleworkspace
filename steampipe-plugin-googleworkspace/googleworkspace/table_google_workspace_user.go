@@ -16,7 +16,7 @@ func tableGoogleWorkspaceUser(ctx context.Context) *plugin.Table {
 		Get: &plugin.GetConfig{
 			Hydrate: nil,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			// Top columns
 			{Name: "id", Type: proto.ColumnType_STRING, Description: "The unique ID of the user."},
 			{Name: "primaryEmail", Type: proto.ColumnType_STRING, Description: "The primary email address of the user."},
@@ -68,6 +68,6 @@ func tableGoogleWorkspaceUser(ctx context.Context) *plugin.Table {
 			{Name: "orgUnitPath", Type: proto.ColumnType_STRING, Description: "The organizational unit path for the user."},
 			{Name: "recoveryEmail", Type: proto.ColumnType_STRING, Description: "The user's recovery email address."},
 			{Name: "recoveryPhone", Type: proto.ColumnType_STRING, Description: "The user's recovery phone number."},
-		},
+		}),
 	}
 }

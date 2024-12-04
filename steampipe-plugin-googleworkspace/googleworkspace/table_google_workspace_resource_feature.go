@@ -16,11 +16,11 @@ func tableGoogleWorkspaceResourceFeature(ctx context.Context) *plugin.Table {
 		Get: &plugin.GetConfig{
 			Hydrate: nil,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			// Top columns
 			{Name: "name", Type: proto.ColumnType_STRING, Description: "The name of the resource."},
 			{Name: "kind", Type: proto.ColumnType_STRING, Description: "The kind of resource."},
 			{Name: "etags", Type: proto.ColumnType_STRING, Description: "The etag identifier for the resource."},
-		},
+		}),
 	}
 }

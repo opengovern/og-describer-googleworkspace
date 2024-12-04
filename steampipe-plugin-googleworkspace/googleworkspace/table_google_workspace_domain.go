@@ -16,7 +16,7 @@ func tableGoogleWorkspaceDomain(ctx context.Context) *plugin.Table {
 		Get: &plugin.GetConfig{
 			Hydrate: nil,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			// Top columns
 			{Name: "kind", Type: proto.ColumnType_STRING, Description: "The type or kind of the domain alias."},
 			{Name: "domainName", Type: proto.ColumnType_STRING, Description: "The domain name for the alias."},
@@ -27,6 +27,6 @@ func tableGoogleWorkspaceDomain(ctx context.Context) *plugin.Table {
 
 			// JSON column for domain aliases
 			{Name: "domainAliases", Type: proto.ColumnType_JSON, Description: "List of domain aliases."},
-		},
+		}),
 	}
 }

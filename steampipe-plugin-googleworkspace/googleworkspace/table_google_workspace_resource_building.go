@@ -16,7 +16,7 @@ func tableGoogleWorkspaceResourceBuilding(ctx context.Context) *plugin.Table {
 		Get: &plugin.GetConfig{
 			Hydrate: nil,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			// Top columns
 			{Name: "buildingId", Type: proto.ColumnType_STRING, Description: "The unique ID of the building."},
 			{Name: "buildingName", Type: proto.ColumnType_STRING, Description: "The name of the building."},
@@ -30,6 +30,6 @@ func tableGoogleWorkspaceResourceBuilding(ctx context.Context) *plugin.Table {
 
 			// Array columns
 			{Name: "floorNames", Type: proto.ColumnType_JSON, Description: "A list of floor names in the building."},
-		},
+		}),
 	}
 }

@@ -16,7 +16,7 @@ func tableGoogleWorkspacePrivilege(ctx context.Context) *plugin.Table {
 		Get: &plugin.GetConfig{
 			Hydrate: nil,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			// Top columns
 			{Name: "etag", Type: proto.ColumnType_STRING, Description: "The etag identifier for the privilege resource."},
 			{Name: "isOuScopable", Type: proto.ColumnType_BOOL, Description: "Indicates whether the privilege is organizational unit scorable."},
@@ -29,6 +29,6 @@ func tableGoogleWorkspacePrivilege(ctx context.Context) *plugin.Table {
 
 			// JSON column for child privileges (nested list)
 			{Name: "childPrivileges", Type: proto.ColumnType_JSON, Description: "A list of child privileges associated with this privilege."},
-		},
+		}),
 	}
 }

@@ -18,10 +18,9 @@ func tableGoogleWorkspaceGmailSettings(_ context.Context) *plugin.Table {
 		Name:        "googleworkspace_gmail_settings",
 		Description: "Retrieves settings for the specified account.",
 		List: &plugin.ListConfig{
-			Hydrate:    listGmailUsers,
-			KeyColumns: plugin.SingleColumn("user_email"),
+			Hydrate: listGmailUsers,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			{
 				Name:        "user_email",
 				Description: "The specified user's email address.",
@@ -69,7 +68,7 @@ func tableGoogleWorkspaceGmailSettings(_ context.Context) *plugin.Table {
 				Hydrate:     getGmailVacationSetting,
 				Transform:   transform.FromValue(),
 			},
-		},
+		}),
 	}
 }
 

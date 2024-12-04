@@ -17,7 +17,7 @@ func tableGoogleWorkspaceOrgUnit(ctx context.Context) *plugin.Table {
 			KeyColumns: plugin.SingleColumn("orgUnitId"),
 			Hydrate:    nil,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			// Top columns
 			{Name: "kind", Type: proto.ColumnType_STRING, Description: "Resource kind identifier, typically 'admin#directory#orgUnit'."},
 			{Name: "name", Type: proto.ColumnType_STRING, Description: "The name of the organizational unit."},
@@ -28,6 +28,6 @@ func tableGoogleWorkspaceOrgUnit(ctx context.Context) *plugin.Table {
 			{Name: "orgUnitPath", Type: proto.ColumnType_STRING, Description: "The full path of the organizational unit in the domain."},
 			{Name: "parentOrgUnitId", Type: proto.ColumnType_STRING, Description: "The ID of the parent organizational unit."},
 			{Name: "parentOrgUnitPath", Type: proto.ColumnType_STRING, Description: "The path of the parent organizational unit."},
-		},
+		}),
 	}
 }

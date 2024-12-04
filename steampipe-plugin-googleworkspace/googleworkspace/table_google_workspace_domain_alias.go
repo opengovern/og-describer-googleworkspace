@@ -16,7 +16,7 @@ func tableGoogleWorkspaceDomainAlias(ctx context.Context) *plugin.Table {
 		Get: &plugin.GetConfig{
 			Hydrate: nil,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			// Top columns
 			{Name: "kind", Type: proto.ColumnType_STRING, Description: "The type or kind of the domain alias entry."},
 			{Name: "parentDomainName", Type: proto.ColumnType_STRING, Description: "The parent domain associated with the alias."},
@@ -24,6 +24,6 @@ func tableGoogleWorkspaceDomainAlias(ctx context.Context) *plugin.Table {
 			{Name: "verified", Type: proto.ColumnType_BOOL, Description: "Indicates whether the domain alias has been verified."},
 			{Name: "etag", Type: proto.ColumnType_STRING, Description: "The etag identifier for the resource."},
 			{Name: "creationTime", Type: proto.ColumnType_TIMESTAMP, Description: "The timestamp when the domain alias entry was created."},
-		},
+		}),
 	}
 }

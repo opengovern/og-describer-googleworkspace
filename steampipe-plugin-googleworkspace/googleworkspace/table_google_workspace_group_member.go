@@ -16,7 +16,7 @@ func tableGoogleWorkspaceGroupMember(ctx context.Context) *plugin.Table {
 		Get: &plugin.GetConfig{
 			Hydrate: nil,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			// Top columns
 			{Name: "kind", Type: proto.ColumnType_STRING, Description: "Resource kind identifier, typically 'admin#directory#groupMember'."},
 			{Name: "email", Type: proto.ColumnType_STRING, Description: "The email address of the group member."},
@@ -26,6 +26,6 @@ func tableGoogleWorkspaceGroupMember(ctx context.Context) *plugin.Table {
 			{Name: "status", Type: proto.ColumnType_STRING, Description: "The membership status of the user in the group, such as 'ACTIVE' or 'INVITED'."},
 			{Name: "delivery_settings", Type: proto.ColumnType_STRING, Description: "The email delivery setting for the member. It can be 'ALL_EMAILS', 'NOTIFICATIONS_ONLY', or 'NONE'."},
 			{Name: "id", Type: proto.ColumnType_STRING, Description: "The unique ID of the group member."},
-		},
+		}),
 	}
 }

@@ -16,13 +16,13 @@ func tableGoogleWorkspaceUserAlias(ctx context.Context) *plugin.Table {
 		Get: &plugin.GetConfig{
 			Hydrate: nil,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			// Top columns
 			{Name: "id", Type: proto.ColumnType_STRING, Description: "The unique ID of the user alias."},
 			{Name: "primaryEmail", Type: proto.ColumnType_STRING, Description: "The primary email address of the user who owns this alias."},
 			{Name: "alias", Type: proto.ColumnType_STRING, Description: "The alias email address."},
 			{Name: "kind", Type: proto.ColumnType_STRING, Description: "Resource kind identifier, typically 'admin#directory#userAlias'."},
 			{Name: "etag", Type: proto.ColumnType_STRING, Description: "ETag of the resource."},
-		},
+		}),
 	}
 }
