@@ -9,7 +9,7 @@ import (
 
 func tableGoogleWorkspaceResourceFeature(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "google_workspace_resource_feature",
+		Name:        "googleworkspace_resource_feature",
 		Description: "Details about a resource, including its name, kind, and etags.",
 		List: &plugin.ListConfig{
 			Hydrate: opengovernance.ListResourceFeature,

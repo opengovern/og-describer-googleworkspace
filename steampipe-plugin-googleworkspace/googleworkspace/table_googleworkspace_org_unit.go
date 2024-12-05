@@ -9,7 +9,7 @@ import (
 
 func tableGoogleWorkspaceOrgUnit(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "google_workspace_org_unit",
+		Name:        "googleworkspace_org_unit",
 		Description: "Organizational Units in the Google Workspace domain.",
 		List: &plugin.ListConfig{
 			Hydrate: opengovernance.ListOrgUnit,

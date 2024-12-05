@@ -9,7 +9,7 @@ import (
 
 func tableGoogleWorkspaceUserAlias(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "google_workspace_user_alias",
+		Name:        "googleworkspace_user_alias",
 		Description: "User aliases in the Google Workspace domain.",
 		List: &plugin.ListConfig{
 			Hydrate: opengovernance.ListUserAlias,

@@ -9,7 +9,7 @@ import (
 
 func tableGoogleWorkspaceRole(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "google_workspace_role",
+		Name:        "googleworkspace_role",
 		Description: "Details about roles in the Google Workspace system, including privileges and system settings.",
 		List: &plugin.ListConfig{
 			Hydrate: opengovernance.ListRole,

@@ -9,7 +9,7 @@ import (
 
 func tableGoogleWorkspaceMobileDevice(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "google_workspace_mobile_device",
+		Name:        "googleworkspace_mobile_device",
 		Description: "Device details including model, status, hardware, and applications.",
 		List: &plugin.ListConfig{
 			Hydrate: opengovernance.ListMobileDevice,

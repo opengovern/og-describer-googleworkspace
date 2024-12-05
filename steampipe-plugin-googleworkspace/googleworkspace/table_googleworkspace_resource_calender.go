@@ -9,7 +9,7 @@ import (
 
 func tableGoogleWorkspaceResourceCalender(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "google_workspace_resource_calender",
+		Name:        "googleworkspace_resource_calender",
 		Description: "Details about resources in a building, including capacity, floor, and category.",
 		List: &plugin.ListConfig{
 			Hydrate: opengovernance.ListResourceCalender,
