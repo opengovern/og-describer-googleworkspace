@@ -6,7 +6,6 @@ import (
 	"github.com/opengovern/og-describer-googleworkspace/pkg/sdk/models"
 	"github.com/opengovern/og-describer-googleworkspace/provider/model"
 	admin "google.golang.org/api/admin/directory/v1"
-	"log"
 	"sync"
 )
 
@@ -70,36 +69,32 @@ func processGroupAliases(ctx context.Context, handler *GoogleWorkspaceAPIHandler
 		return fmt.Errorf("error during request handling: %w", err)
 	}
 	for _, alias := range aliasesResp.Aliases {
-		log.Println(alias)
 		wg.Add(1)
-		if aliasValue, ok := alias.(admin.GroupAlias); ok {
-			go func(aliasValue admin.GroupAlias) {
+		if aliasValue, ok := alias.(map[string]interface{}); ok {
+			go func(aliasValue map[string]interface{}) {
 				defer wg.Done()
+				id, _ := aliasValue["id"].(string)
+				aliasName, _ := aliasValue["alias"].(string)
+				etag, _ := aliasValue["etag"].(string)
+				kind, _ := aliasValue["kind"].(string)
+				primaryEmail, _ := aliasValue["primaryEmail"].(string)
 				value := models.Resource{
-					ID:   aliasValue.Id,
-					Name: aliasValue.Alias,
+					ID:   id,
+					Name: aliasName,
 					Description: JSONAllFieldsMarshaller{
-						Value: model.GroupAliasDescription{
-							GroupAlias: aliasValue,
+						Value: model.UserAliasDescription{
+							UserAlias: admin.UserAlias{
+								Alias:        aliasName,
+								Etag:         etag,
+								Id:           id,
+								Kind:         kind,
+								PrimaryEmail: primaryEmail,
+							},
 						},
 					},
 				}
 				GoogleWorkspaceChan <- value
 			}(aliasValue)
-		} else if GroupAliasValuePtr, ok := alias.(*admin.GroupAlias); ok {
-			go func(GroupAliasValuePtr *admin.GroupAlias) {
-				defer wg.Done()
-				value := models.Resource{
-					ID:   GroupAliasValuePtr.Id,
-					Name: GroupAliasValuePtr.Alias,
-					Description: JSONAllFieldsMarshaller{
-						Value: model.GroupAliasDescription{
-							GroupAlias: *GroupAliasValuePtr,
-						},
-					},
-				}
-				GoogleWorkspaceChan <- value
-			}(GroupAliasValuePtr)
 		}
 	}
 	return nil

@@ -40,8 +40,11 @@ func DescribeListByGoogleWorkspace(describe func(context.Context, *describer.Goo
 			admin.AdminDirectoryUserReadonlyScope,
 			admin.AdminDirectoryGroupReadonlyScope,
 			admin.AdminDirectoryDeviceMobileReadonlyScope,
+			admin.AdminDirectoryDeviceChromeosReadonlyScope,
 			admin.AdminDirectoryOrgunitReadonlyScope,
 			admin.AdminDirectoryRolemanagementReadonlyScope,
+			//admin.AdminDirectoryResourceCalendarReadonlyScope,
+			admin.AdminDirectoryDomainReadonlyScope,
 		}
 
 		// Create credentials using the service account key

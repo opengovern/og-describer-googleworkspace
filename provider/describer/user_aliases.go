@@ -6,7 +6,6 @@ import (
 	"github.com/opengovern/og-describer-googleworkspace/pkg/sdk/models"
 	"github.com/opengovern/og-describer-googleworkspace/provider/model"
 	admin "google.golang.org/api/admin/directory/v1"
-	"log"
 	"sync"
 )
 
@@ -70,40 +69,32 @@ func processUserAliases(ctx context.Context, handler *GoogleWorkspaceAPIHandler,
 		return fmt.Errorf("error during request handling: %w", err)
 	}
 	for _, alias := range aliasesResp.Aliases {
-		log.Println(alias)
 		wg.Add(1)
-		if aliasValue, ok := alias.(admin.UserAlias); ok {
-			go func(aliasValue admin.UserAlias) {
+		if aliasValue, ok := alias.(map[string]interface{}); ok {
+			go func(aliasValue map[string]interface{}) {
 				defer wg.Done()
+				id, _ := aliasValue["id"].(string)
+				aliasName, _ := aliasValue["alias"].(string)
+				etag, _ := aliasValue["etag"].(string)
+				kind, _ := aliasValue["kind"].(string)
+				primaryEmail, _ := aliasValue["primaryEmail"].(string)
 				value := models.Resource{
-					ID:   aliasValue.Id,
-					Name: aliasValue.Alias,
+					ID:   id,
+					Name: aliasName,
 					Description: JSONAllFieldsMarshaller{
 						Value: model.UserAliasDescription{
-							UserAlias: aliasValue,
+							UserAlias: admin.UserAlias{
+								Alias:        aliasName,
+								Etag:         etag,
+								Id:           id,
+								Kind:         kind,
+								PrimaryEmail: primaryEmail,
+							},
 						},
 					},
 				}
 				GoogleWorkspaceChan <- value
 			}(aliasValue)
-		} else if UserAliasValuePtr, ok := alias.(*admin.UserAlias); ok {
-			go func(UserAliasValuePtr *admin.UserAlias) {
-				defer wg.Done()
-				value := models.Resource{
-					ID:   UserAliasValuePtr.Id,
-					Name: UserAliasValuePtr.Alias,
-					Description: JSONAllFieldsMarshaller{
-						Value: model.UserAliasDescription{
-							UserAlias: *UserAliasValuePtr,
-						},
-					},
-				}
-				GoogleWorkspaceChan <- value
-			}(UserAliasValuePtr)
-		} else if _, ok := alias.(*admin.Alias); ok {
-			log.Println(1)
-		} else if _, ok := alias.(admin.Alias); ok {
-			log.Println(2)
 		}
 	}
 	return nil
