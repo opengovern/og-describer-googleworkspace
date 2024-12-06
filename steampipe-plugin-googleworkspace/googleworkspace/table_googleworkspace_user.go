@@ -9,7 +9,7 @@ import (
 
 func tableGoogleWorkspaceUser(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "google_workspace_user",
+		Name:        "googleworkspace_user",
 		Description: "Users in the Google Workspace domain.",
 		List: &plugin.ListConfig{
 			Hydrate: opengovernance.ListUser,

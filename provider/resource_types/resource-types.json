@@ -3,112 +3,112 @@
     "ResourceName": "GoogleWorkspace/User",
     "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListUsers)",
     "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetUser)",
-    "SteampipeTable": "google_workspace_user",
+    "SteampipeTable": "googleworkspace_user",
     "Model": "User"
   },
   {
     "ResourceName": "GoogleWorkspace/UserAlias",
     "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListUserAliases)",
     "GetDescriber": "",
-    "SteampipeTable": "google_workspace_user_alias",
+    "SteampipeTable": "googleworkspace_user_alias",
     "Model": "UserAlias"
   },
   {
     "ResourceName": "GoogleWorkspace/Group",
     "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListGroups)",
     "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetGroup)",
-    "SteampipeTable": "google_workspace_group",
+    "SteampipeTable": "googleworkspace_group",
     "Model": "Group"
   },
   {
     "ResourceName": "GoogleWorkspace/GroupMember",
     "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListGroupMembers)",
     "GetDescriber": "",
-    "SteampipeTable": "google_workspace_group_member",
+    "SteampipeTable": "googleworkspace_group_member",
     "Model": "GroupMember"
   },
   {
     "ResourceName": "GoogleWorkspace/GroupAlias",
     "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListGroupAliases)",
     "GetDescriber": "",
-    "SteampipeTable": "google_workspace_group_alias",
+    "SteampipeTable": "googleworkspace_group_alias",
     "Model": "GroupAlias"
   },
   {
     "ResourceName": "GoogleWorkspace/OrgUnit",
     "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListOrgUnits)",
     "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetOrgUnit)",
-    "SteampipeTable": "google_workspace_org_unit",
+    "SteampipeTable": "googleworkspace_org_unit",
     "Model": "OrgUnit"
   },
   {
     "ResourceName": "GoogleWorkspace/MobileDevice",
     "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListMobileDevices)",
     "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetMobileDevice)",
-    "SteampipeTable": "google_workspace_mobile_device",
+    "SteampipeTable": "googleworkspace_mobile_device",
     "Model": "MobileDevice"
   },
   {
     "ResourceName": "GoogleWorkspace/ChromeDevice",
     "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListChromeDevices)",
     "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetChromeDevice)",
-    "SteampipeTable": "google_workspace_chrome_device",
+    "SteampipeTable": "googleworkspace_chrome_device",
     "Model": "ChromeDevice"
   },
   {
     "ResourceName": "GoogleWorkspace/Role",
     "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListRoles)",
     "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetRole)",
-    "SteampipeTable": "google_workspace_role",
+    "SteampipeTable": "googleworkspace_role",
     "Model": "Role"
   },
   {
     "ResourceName": "GoogleWorkspace/RoleAssignment",
     "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListRoleAssignments)",
     "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetRoleAssignment)",
-    "SteampipeTable": "google_workspace_role_assignment",
+    "SteampipeTable": "googleworkspace_role_assignment",
     "Model": "RoleAssignment"
   },
   {
     "ResourceName": "GoogleWorkspace/Domain",
     "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListDomains)",
     "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetDomain)",
-    "SteampipeTable": "google_workspace_domain",
+    "SteampipeTable": "googleworkspace_domain",
     "Model": "Domain"
   },
   {
     "ResourceName": "GoogleWorkspace/DomainAlias",
     "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListDomainAliases)",
     "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetDomainAlias)",
-    "SteampipeTable": "google_workspace_domain_alias",
+    "SteampipeTable": "googleworkspace_domain_alias",
     "Model": "DomainAlias"
   },
   {
     "ResourceName": "GoogleWorkspace/Privilege",
     "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListPrivileges)",
     "GetDescriber": "",
-    "SteampipeTable": "google_workspace_privilege",
+    "SteampipeTable": "googleworkspace_privilege",
     "Model": "Privilege"
   },
   {
     "ResourceName": "GoogleWorkspace/ResourceBuilding",
     "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListResourceBuildings)",
     "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetResourceBuilding)",
-    "SteampipeTable": "google_workspace_resource_building",
+    "SteampipeTable": "googleworkspace_resource_building",
     "Model": "ResourceBuilding"
   },
   {
     "ResourceName": "GoogleWorkspace/ResourceCalender",
     "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListResourceCalenders)",
     "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetResourceCalender)",
-    "SteampipeTable": "google_workspace_resource_calender",
+    "SteampipeTable": "googleworkspace_resource_calender",
     "Model": "ResourceCalender"
   },
   {
     "ResourceName": "GoogleWorkspace/ResourceFeature",
     "ListDescriber": "DescribeListByGoogleWorkspace(describer.ListResourceFeatures)",
     "GetDescriber": "DescribeSingleByGoogleWorkspace(describer.GetResourceFeature)",
-    "SteampipeTable": "google_workspace_resource_feature",
+    "SteampipeTable": "googleworkspace_resource_feature",
     "Model": "ResourceFeature"
   }
 ]

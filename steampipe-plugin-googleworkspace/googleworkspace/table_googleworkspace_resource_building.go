@@ -9,7 +9,7 @@ import (
 
 func tableGoogleWorkspaceResourceBuilding(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "google_workspace_resource_building",
+		Name:        "googleworkspace_resource_building",
 		Description: "Details about a building, including address, coordinates, and floor information.",
 		List: &plugin.ListConfig{
 			Hydrate: opengovernance.ListResourceBuilding,

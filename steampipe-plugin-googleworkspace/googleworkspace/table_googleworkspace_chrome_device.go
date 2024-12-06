@@ -8,7 +8,7 @@ import (
 
 func tableGoogleWorkspaceChromeDevice(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "google_workspace_chrome_device",
+		Name:        "googleworkspace_chrome_device",
 		Description: "Details of mobile devices, including model, status, hardware, and software information.",
 		List: &plugin.ListConfig{
 			Hydrate: nil,

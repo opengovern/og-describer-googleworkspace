@@ -9,7 +9,7 @@ import (
 
 func tableGoogleWorkspacePrivilege(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "google_workspace_privilege",
+		Name:        "googleworkspace_privilege",
 		Description: "Information about privileges, including service details and child privileges.",
 		List: &plugin.ListConfig{
 			Hydrate: opengovernance.ListPrivilege,

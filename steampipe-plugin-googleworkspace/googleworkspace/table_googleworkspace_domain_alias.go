@@ -9,7 +9,7 @@ import (
 
 func tableGoogleWorkspaceDomainAlias(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "google_workspace_domain_alias",
+		Name:        "googleworkspace_domain_alias",
 		Description: "Information about a domain alias entry, including the parent domain, alias name, and verification status.",
 		List: &plugin.ListConfig{
 			Hydrate: opengovernance.ListDomainAlias,

@@ -10,7 +10,7 @@ import (
 
 func tableGoogleWorkspaceDomain(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "google_workspace_domain",
+		Name:        "googleworkspace_domain",
 		Description: "Information about domain aliases in Google Workspace, including domain name, verification status, and aliases.",
 		List: &plugin.ListConfig{
 			Hydrate: opengovernance.ListDomain,
