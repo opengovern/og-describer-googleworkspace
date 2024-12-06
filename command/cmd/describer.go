@@ -52,7 +52,7 @@ var describerCmd = &cobra.Command{
 		ctx := context.Background()
 		logger, _ := zap.NewProduction()
 
-		keyFileJson := ""
+		keyFileJson := ``
 
 		creds := configs.IntegrationCredentials{}
 

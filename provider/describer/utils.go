@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"golang.org/x/time/rate"
 	admin "google.golang.org/api/admin/directory/v1"
-	"google.golang.org/api/gmail/v1"
 	"net/http"
 	"time"
 )
@@ -26,7 +25,6 @@ const (
 
 type GoogleWorkspaceAPIHandler struct {
 	AdminService *admin.Service
-	GmailService *gmail.Service
 	CustomerID   string
 	RateLimiter  *rate.Limiter
 	Semaphore    chan struct{}
@@ -34,10 +32,9 @@ type GoogleWorkspaceAPIHandler struct {
 	RetryBackoff time.Duration
 }
 
-func NewGoogleWorkspaceAPIHandler(adminService *admin.Service, gmailService *gmail.Service, customerID string, rateLimit rate.Limit, burst int, maxConcurrency int, maxRetries int, retryBackoff time.Duration) *GoogleWorkspaceAPIHandler {
+func NewGoogleWorkspaceAPIHandler(adminService *admin.Service, customerID string, rateLimit rate.Limit, burst int, maxConcurrency int, maxRetries int, retryBackoff time.Duration) *GoogleWorkspaceAPIHandler {
 	return &GoogleWorkspaceAPIHandler{
 		AdminService: adminService,
-		GmailService: gmailService,
 		CustomerID:   customerID,
 		RateLimiter:  rate.NewLimiter(rateLimit, burst),
 		Semaphore:    make(chan struct{}, maxConcurrency),
