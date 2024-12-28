@@ -16,7 +16,7 @@ func tableGoogleWorkspaceChromeDevice(ctx context.Context) *plugin.Table {
 		Get: &plugin.GetConfig{
 			Hydrate: nil,
 		},
-		Columns: []*plugin.Column{
+		Columns: commonColumns([]*plugin.Column{
 			// Basic details columns
 			{Name: "deviceId", Type: proto.ColumnType_STRING, Description: "Unique device identifier."},
 			{Name: "serialNumber", Type: proto.ColumnType_STRING, Description: "The serial number of the device."},
@@ -64,6 +64,6 @@ func tableGoogleWorkspaceChromeDevice(ctx context.Context) *plugin.Table {
 			// Fan and backlight info
 			{Name: "fanInfo", Type: proto.ColumnType_JSON, Description: "Information about the device's fan."},
 			{Name: "backlightInfo", Type: proto.ColumnType_JSON, Description: "Information about the device's backlight."},
-		},
+		}),
 	}
 }
