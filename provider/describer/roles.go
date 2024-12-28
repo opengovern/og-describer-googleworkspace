@@ -55,10 +55,8 @@ func GetRole(ctx context.Context, handler *GoogleWorkspaceAPIHandler, resourceID
 	value := models.Resource{
 		ID:   strconv.Itoa(int(role.RoleId)),
 		Name: role.RoleName,
-		Description: JSONAllFieldsMarshaller{
-			Value: model.RoleDescription{
-				Role: *role,
-			},
+		Description: model.RoleDescription{
+			Role: *role,
 		},
 	}
 	return &value, nil
@@ -104,10 +102,8 @@ func processRoles(ctx context.Context, handler *GoogleWorkspaceAPIHandler, Googl
 			value := models.Resource{
 				ID:   strconv.Itoa(int(role.RoleId)),
 				Name: role.RoleName,
-				Description: JSONAllFieldsMarshaller{
-					Value: model.RoleDescription{
-						Role: *role,
-					},
+				Description: model.RoleDescription{
+					Role: *role,
 				},
 			}
 			GoogleWorkspaceChan <- value

@@ -70,10 +70,8 @@ func processPrivileges(ctx context.Context, handler *GoogleWorkspaceAPIHandler, 
 			value := models.Resource{
 				ID:   privilege.PrivilegeName,
 				Name: privilege.PrivilegeName,
-				Description: JSONAllFieldsMarshaller{
-					Value: model.PrivilegeDescription{
-						Privilege: *privilege,
-					},
+				Description: model.PrivilegeDescription{
+					Privilege: *privilege,
 				},
 			}
 			GoogleWorkspaceChan <- value

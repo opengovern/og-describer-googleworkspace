@@ -54,10 +54,8 @@ func GetUser(ctx context.Context, handler *GoogleWorkspaceAPIHandler, resourceID
 	value := models.Resource{
 		ID:   user.Id,
 		Name: user.Name.FullName,
-		Description: JSONAllFieldsMarshaller{
-			Value: model.UserDescription{
-				User: *user,
-			},
+		Description: model.UserDescription{
+			User: *user,
 		},
 	}
 	return &value, nil
@@ -103,10 +101,8 @@ func processUsers(ctx context.Context, handler *GoogleWorkspaceAPIHandler, Googl
 			value := models.Resource{
 				ID:   user.Id,
 				Name: user.Name.FullName,
-				Description: JSONAllFieldsMarshaller{
-					Value: model.UserDescription{
-						User: *user,
-					},
+				Description: model.UserDescription{
+					User: *user,
 				},
 			}
 			GoogleWorkspaceChan <- value

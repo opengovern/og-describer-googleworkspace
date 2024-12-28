@@ -54,10 +54,8 @@ func GetDomainAlias(ctx context.Context, handler *GoogleWorkspaceAPIHandler, res
 	value := models.Resource{
 		ID:   domainAlias.DomainAliasName,
 		Name: domainAlias.DomainAliasName,
-		Description: JSONAllFieldsMarshaller{
-			Value: model.DomainAliasDescription{
-				DomainAlias: *domainAlias,
-			},
+		Description: model.DomainAliasDescription{
+			DomainAlias: *domainAlias,
 		},
 	}
 	return &value, nil
@@ -90,10 +88,8 @@ func processDomainAliases(ctx context.Context, handler *GoogleWorkspaceAPIHandle
 			value := models.Resource{
 				ID:   domainAlias.DomainAliasName,
 				Name: domainAlias.DomainAliasName,
-				Description: JSONAllFieldsMarshaller{
-					Value: model.DomainAliasDescription{
-						DomainAlias: *domainAlias,
-					},
+				Description: model.DomainAliasDescription{
+					DomainAlias: *domainAlias,
 				},
 			}
 			GoogleWorkspaceChan <- value

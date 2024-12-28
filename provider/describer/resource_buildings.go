@@ -54,10 +54,8 @@ func GetResourceBuilding(ctx context.Context, handler *GoogleWorkspaceAPIHandler
 	value := models.Resource{
 		ID:   building.BuildingId,
 		Name: building.BuildingName,
-		Description: JSONAllFieldsMarshaller{
-			Value: model.ResourceBuildingDescription{
-				Building: *building,
-			},
+		Description: model.ResourceBuildingDescription{
+			Building: *building,
 		},
 	}
 	return &value, nil
@@ -103,10 +101,8 @@ func processResourceBuildings(ctx context.Context, handler *GoogleWorkspaceAPIHa
 			value := models.Resource{
 				ID:   building.BuildingId,
 				Name: building.BuildingName,
-				Description: JSONAllFieldsMarshaller{
-					Value: model.ResourceBuildingDescription{
-						Building: *building,
-					},
+				Description: model.ResourceBuildingDescription{
+					Building: *building,
 				},
 			}
 			GoogleWorkspaceChan <- value

@@ -54,10 +54,8 @@ func GetOrgUnit(ctx context.Context, handler *GoogleWorkspaceAPIHandler, resourc
 	value := models.Resource{
 		ID:   orgUnit.OrgUnitId,
 		Name: orgUnit.Name,
-		Description: JSONAllFieldsMarshaller{
-			Value: model.OrgUnitDescription{
-				OrgUnit: *orgUnit,
-			},
+		Description: model.OrgUnitDescription{
+			OrgUnit: *orgUnit,
 		},
 	}
 	return &value, nil
@@ -91,10 +89,8 @@ func processOrgUnits(ctx context.Context, handler *GoogleWorkspaceAPIHandler, Go
 			value := models.Resource{
 				ID:   orgUnit.OrgUnitId,
 				Name: orgUnit.Name,
-				Description: JSONAllFieldsMarshaller{
-					Value: model.OrgUnitDescription{
-						OrgUnit: *orgUnit,
-					},
+				Description: model.OrgUnitDescription{
+					OrgUnit: *orgUnit,
 				},
 			}
 			GoogleWorkspaceChan <- value

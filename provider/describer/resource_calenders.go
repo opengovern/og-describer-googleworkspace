@@ -54,10 +54,8 @@ func GetResourceCalender(ctx context.Context, handler *GoogleWorkspaceAPIHandler
 	value := models.Resource{
 		ID:   calender.ResourceId,
 		Name: calender.ResourceName,
-		Description: JSONAllFieldsMarshaller{
-			Value: model.ResourceCalenderDescription{
-				CalendarResource: *calender,
-			},
+		Description: model.ResourceCalenderDescription{
+			CalendarResource: *calender,
 		},
 	}
 	return &value, nil
@@ -103,10 +101,8 @@ func processResourceCalenders(ctx context.Context, handler *GoogleWorkspaceAPIHa
 			value := models.Resource{
 				ID:   calender.ResourceId,
 				Name: calender.ResourceName,
-				Description: JSONAllFieldsMarshaller{
-					Value: model.ResourceCalenderDescription{
-						CalendarResource: *calender,
-					},
+				Description: model.ResourceCalenderDescription{
+					CalendarResource: *calender,
 				},
 			}
 			GoogleWorkspaceChan <- value

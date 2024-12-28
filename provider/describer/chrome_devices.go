@@ -54,10 +54,8 @@ func GetChromeDevice(ctx context.Context, handler *GoogleWorkspaceAPIHandler, re
 	value := models.Resource{
 		ID:   chromeDevice.DeviceId,
 		Name: chromeDevice.DeviceId,
-		Description: JSONAllFieldsMarshaller{
-			Value: model.ChromeDeviceDescription{
-				ChromeOsDevice: *chromeDevice,
-			},
+		Description: model.ChromeDeviceDescription{
+			ChromeOsDevice: *chromeDevice,
 		},
 	}
 	return &value, nil
@@ -103,10 +101,8 @@ func processChromeDevices(ctx context.Context, handler *GoogleWorkspaceAPIHandle
 			value := models.Resource{
 				ID:   chromeDevice.DeviceId,
 				Name: chromeDevice.DeviceId,
-				Description: JSONAllFieldsMarshaller{
-					Value: model.ChromeDeviceDescription{
-						ChromeOsDevice: *chromeDevice,
-					},
+				Description: model.ChromeDeviceDescription{
+					ChromeOsDevice: *chromeDevice,
 				},
 			}
 			GoogleWorkspaceChan <- value

@@ -54,10 +54,8 @@ func GetResourceFeature(ctx context.Context, handler *GoogleWorkspaceAPIHandler,
 	value := models.Resource{
 		ID:   feature.Name,
 		Name: feature.Name,
-		Description: JSONAllFieldsMarshaller{
-			Value: model.ResourceFeatureDescription{
-				Feature: *feature,
-			},
+		Description: model.ResourceFeatureDescription{
+			Feature: *feature,
 		},
 	}
 	return &value, nil
@@ -103,10 +101,8 @@ func processResourceFeatures(ctx context.Context, handler *GoogleWorkspaceAPIHan
 			value := models.Resource{
 				ID:   feature.Name,
 				Name: feature.Name,
-				Description: JSONAllFieldsMarshaller{
-					Value: model.ResourceFeatureDescription{
-						Feature: *feature,
-					},
+				Description: model.ResourceFeatureDescription{
+					Feature: *feature,
 				},
 			}
 			GoogleWorkspaceChan <- value

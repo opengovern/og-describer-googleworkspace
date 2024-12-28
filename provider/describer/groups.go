@@ -54,10 +54,8 @@ func GetGroup(ctx context.Context, handler *GoogleWorkspaceAPIHandler, resourceI
 	value := models.Resource{
 		ID:   group.Id,
 		Name: group.Name,
-		Description: JSONAllFieldsMarshaller{
-			Value: model.GroupDescription{
-				Group: *group,
-			},
+		Description: model.GroupDescription{
+			Group: *group,
 		},
 	}
 	return &value, nil
@@ -103,10 +101,8 @@ func processGroups(ctx context.Context, handler *GoogleWorkspaceAPIHandler, Goog
 			value := models.Resource{
 				ID:   group.Id,
 				Name: group.Name,
-				Description: JSONAllFieldsMarshaller{
-					Value: model.GroupDescription{
-						Group: *group,
-					},
+				Description: model.GroupDescription{
+					Group: *group,
 				},
 			}
 			GoogleWorkspaceChan <- value

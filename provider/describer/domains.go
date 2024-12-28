@@ -54,10 +54,8 @@ func GetDomain(ctx context.Context, handler *GoogleWorkspaceAPIHandler, resource
 	value := models.Resource{
 		ID:   domain.DomainName,
 		Name: domain.DomainName,
-		Description: JSONAllFieldsMarshaller{
-			Value: model.DomainDescription{
-				Domains: *domain,
-			},
+		Description: model.DomainDescription{
+			Domains: *domain,
 		},
 	}
 	return &value, nil
@@ -90,10 +88,8 @@ func processDomains(ctx context.Context, handler *GoogleWorkspaceAPIHandler, Goo
 			value := models.Resource{
 				ID:   domain.DomainName,
 				Name: domain.DomainName,
-				Description: JSONAllFieldsMarshaller{
-					Value: model.DomainDescription{
-						Domains: *domain,
-					},
+				Description: model.DomainDescription{
+					Domains: *domain,
 				},
 			}
 			GoogleWorkspaceChan <- value

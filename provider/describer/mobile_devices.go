@@ -54,10 +54,8 @@ func GetMobileDevice(ctx context.Context, handler *GoogleWorkspaceAPIHandler, re
 	value := models.Resource{
 		ID:   mobileDevice.DeviceId,
 		Name: mobileDevice.DeviceId,
-		Description: JSONAllFieldsMarshaller{
-			Value: model.MobileDeviceDescription{
-				MobileDevice: *mobileDevice,
-			},
+		Description: model.MobileDeviceDescription{
+			MobileDevice: *mobileDevice,
 		},
 	}
 	return &value, nil
@@ -103,10 +101,8 @@ func processMobileDevices(ctx context.Context, handler *GoogleWorkspaceAPIHandle
 			value := models.Resource{
 				ID:   mobileDevice.DeviceId,
 				Name: mobileDevice.DeviceId,
-				Description: JSONAllFieldsMarshaller{
-					Value: model.MobileDeviceDescription{
-						MobileDevice: *mobileDevice,
-					},
+				Description: model.MobileDeviceDescription{
+					MobileDevice: *mobileDevice,
 				},
 			}
 			GoogleWorkspaceChan <- value

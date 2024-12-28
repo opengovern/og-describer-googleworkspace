@@ -81,15 +81,13 @@ func processUserAliases(ctx context.Context, handler *GoogleWorkspaceAPIHandler,
 				value := models.Resource{
 					ID:   id,
 					Name: aliasName,
-					Description: JSONAllFieldsMarshaller{
-						Value: model.UserAliasDescription{
-							UserAlias: admin.UserAlias{
-								Alias:        aliasName,
-								Etag:         etag,
-								Id:           id,
-								Kind:         kind,
-								PrimaryEmail: primaryEmail,
-							},
+					Description: model.UserAliasDescription{
+						UserAlias: admin.UserAlias{
+							Alias:        aliasName,
+							Etag:         etag,
+							Id:           id,
+							Kind:         kind,
+							PrimaryEmail: primaryEmail,
 						},
 					},
 				}

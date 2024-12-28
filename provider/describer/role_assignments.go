@@ -55,10 +55,8 @@ func GetRoleAssignment(ctx context.Context, handler *GoogleWorkspaceAPIHandler, 
 	value := models.Resource{
 		ID:   strconv.Itoa(int(roleAssignment.RoleAssignmentId)),
 		Name: strconv.Itoa(int(roleAssignment.RoleAssignmentId)),
-		Description: JSONAllFieldsMarshaller{
-			Value: model.RoleAssignmentDescription{
-				RoleAssignment: *roleAssignment,
-			},
+		Description: model.RoleAssignmentDescription{
+			RoleAssignment: *roleAssignment,
 		},
 	}
 	return &value, nil
@@ -104,10 +102,8 @@ func processRoleAssignments(ctx context.Context, handler *GoogleWorkspaceAPIHand
 			value := models.Resource{
 				ID:   strconv.Itoa(int(roleAssignment.RoleAssignmentId)),
 				Name: strconv.Itoa(int(roleAssignment.RoleAssignmentId)),
-				Description: JSONAllFieldsMarshaller{
-					Value: model.RoleAssignmentDescription{
-						RoleAssignment: *roleAssignment,
-					},
+				Description: model.RoleAssignmentDescription{
+					RoleAssignment: *roleAssignment,
 				},
 			}
 			GoogleWorkspaceChan <- value

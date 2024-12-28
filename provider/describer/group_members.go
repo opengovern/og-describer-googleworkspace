@@ -90,10 +90,8 @@ func processGroupMembers(ctx context.Context, handler *GoogleWorkspaceAPIHandler
 			value := models.Resource{
 				ID:   member.Id,
 				Name: member.Email,
-				Description: JSONAllFieldsMarshaller{
-					Value: model.GroupMemberDescription{
-						Member: *member,
-					},
+				Description: model.GroupMemberDescription{
+					Member: *member,
 				},
 			}
 			GoogleWorkspaceChan <- value
