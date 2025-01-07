@@ -108,6 +108,8 @@ func DescribeSingleByGoogleWorkspace(describe func(context.Context, *describer.G
 
 		// Create credentials using the service account key
 		keyFileData := []byte(cfg.KeyFile)
+		fmt.Println("keyFileData", keyFileData)
+		fmt.Println("Key file converted to bytes")
 		config, err := google.JWTConfigFromJSON(keyFileData, scopes...)
 		if err != nil {
 			return nil, fmt.Errorf("error creating JWT config: %v", err)
