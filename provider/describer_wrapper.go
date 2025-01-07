@@ -1,8 +1,11 @@
 package provider
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
+
 	model "github.com/opengovern/og-describer-googleworkspace/pkg/sdk/models"
 	"github.com/opengovern/og-describer-googleworkspace/provider/configs"
 	"github.com/opengovern/og-describer-googleworkspace/provider/describer"
@@ -12,7 +15,6 @@ import (
 	"golang.org/x/time/rate"
 	admin "google.golang.org/api/admin/directory/v1"
 	"google.golang.org/api/option"
-	"time"
 )
 
 // DescribeListByGoogleWorkspace A wrapper to pass GoogleWorkspace authorization to describer functions
@@ -48,7 +50,12 @@ func DescribeListByGoogleWorkspace(describe func(context.Context, *describer.Goo
 		}
 
 		// Create credentials using the service account key
+		// convert key file to json raw messge
+		cfg.KeyFile = json.RawMessage(cfg.KeyFile)
+		fmt.Println("keyFileData1", cfg.KeyFile)
+
 		keyFileData := []byte(cfg.KeyFile)
+
 		fmt.Println("keyFileData", keyFileData)
 		fmt.Println("Key file converted to bytes")
 		config, err := google.JWTConfigFromJSON(keyFileData, scopes...)
@@ -108,6 +115,7 @@ func DescribeSingleByGoogleWorkspace(describe func(context.Context, *describer.G
 		}
 
 		// Create credentials using the service account key
+		cfg.KeyFile = json.RawMessage(cfg.KeyFile)
 		keyFileData := []byte(cfg.KeyFile)
 		fmt.Println("keyFileData", keyFileData)
 		fmt.Println("Key file converted to bytes")
