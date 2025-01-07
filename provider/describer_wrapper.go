@@ -48,7 +48,9 @@ func DescribeListByGoogleWorkspace(describe func(context.Context, *describer.Goo
 		}
 
 		// Create credentials using the service account key
-		config, err := google.JWTConfigFromJSON(cfg.KeyFile, scopes...)
+		keyFileData := []byte(cfg.KeyFile)
+
+		config, err := google.JWTConfigFromJSON(keyFileData, scopes...)
 		if err != nil {
 			return nil, fmt.Errorf("error creating JWT config: %v", err)
 		}
@@ -105,7 +107,8 @@ func DescribeSingleByGoogleWorkspace(describe func(context.Context, *describer.G
 		}
 
 		// Create credentials using the service account key
-		config, err := google.JWTConfigFromJSON(cfg.KeyFile, scopes...)
+		keyFileData := []byte(cfg.KeyFile)
+		config, err := google.JWTConfigFromJSON(keyFileData, scopes...)
 		if err != nil {
 			return nil, fmt.Errorf("error creating JWT config: %v", err)
 		}
