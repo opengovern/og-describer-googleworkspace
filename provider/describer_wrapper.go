@@ -1,10 +1,11 @@
 package provider
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
+	// "unsafe"
 
 	model "github.com/opengovern/og-describer-googleworkspace/pkg/sdk/models"
 	"github.com/opengovern/og-describer-googleworkspace/provider/configs"
@@ -50,14 +51,18 @@ func DescribeListByGoogleWorkspace(describe func(context.Context, *describer.Goo
 		}
 
 		// Create credentials using the service account key
-		// convert key file to json raw messge
-		cfg.KeyFile = json.RawMessage(cfg.KeyFile)
-		fmt.Println("keyFileData1", cfg.KeyFile)
+		
+		key_file_string := string(cfg.KeyFile)
+		unescapedString := strings.ReplaceAll(key_file_string, `\n`, "<NEWLINE>")
+		unescapedString = strings.ReplaceAll(unescapedString, `\<NEWLINE>`, "\\n")
+		unescapedString = strings.ReplaceAll(unescapedString, `<NEWLINE>`, "")
+		unescapedString = strings.ReplaceAll(unescapedString, `\"`, `"`)
+		unescapedString = strings.Trim(unescapedString, `"`)
 
-		keyFileData := []byte(cfg.KeyFile)
+		keyFileData := []byte(unescapedString)
 
-		fmt.Println("keyFileData", keyFileData)
-		fmt.Println("Key file converted to bytes")
+		// fmt.Println("keyFileData", keyFileData)
+		// fmt.Println("Key file converted to bytes")
 		config, err := google.JWTConfigFromJSON(keyFileData, scopes...)
 		if err != nil {
 			return nil, fmt.Errorf("error creating JWT config: %v", err)
@@ -115,10 +120,14 @@ func DescribeSingleByGoogleWorkspace(describe func(context.Context, *describer.G
 		}
 
 		// Create credentials using the service account key
-		cfg.KeyFile = json.RawMessage(cfg.KeyFile)
-		keyFileData := []byte(cfg.KeyFile)
-		fmt.Println("keyFileData", keyFileData)
-		fmt.Println("Key file converted to bytes")
+		key_file_string := string(cfg.KeyFile)
+		unescapedString := strings.ReplaceAll(key_file_string, `\n`, "<NEWLINE>")
+		unescapedString = strings.ReplaceAll(unescapedString, `\<NEWLINE>`, "\\n")
+		unescapedString = strings.ReplaceAll(unescapedString, `<NEWLINE>`, "")
+		unescapedString = strings.ReplaceAll(unescapedString, `\"`, `"`)
+		unescapedString = strings.Trim(unescapedString, `"`)
+
+		keyFileData := []byte(unescapedString)
 		config, err := google.JWTConfigFromJSON(keyFileData, scopes...)
 		if err != nil {
 			return nil, fmt.Errorf("error creating JWT config: %v", err)
