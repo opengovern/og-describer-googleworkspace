@@ -28,6 +28,7 @@
         ]
       }
     ],
+    
     "integrations": [
       {
         "label": "GitHub Organization",
